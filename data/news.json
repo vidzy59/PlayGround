@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "tag": "RUMOR",
+    "title": "Snapdragon 8 Elite Gen 2 bocor: clock 5GHz, AnTuTu tembus 4 juta?",
+    "desc": "Leak Digital Chat Station mengungkap peningkatan 25% CPU dan GPU baru Adreno 840. Xiaomi 16 dan ROG Phone 10 diprediksi jadi yang pertama.",
+    "date": "1 Okt 2026",
+    "read": "4 mnt"
+  },
+  {
+    "id": 2,
+    "tag": "REVIEW",
+    "title": "Review POCO X7 Pro setelah 3 bulan: masih raja 4 jutaan?",
+    "desc": "Baterai 6000 mAh tetap awet, HyperOS 2 makin stabil, tapi kamera UW-nya tetap titik lemah. Skor kepuasan 4.6/5 dari 3.400 voter.",
+    "date": "30 Sep 2026",
+    "read": "8 mnt"
+  },
+  {
+    "id": 3,
+    "tag": "HARGA",
+    "title": "Harga iPhone 15 turun Rp 2,5 juta, momen terbaik beli?",
+    "desc": "Distributor resmi menurunkan harga iPhone 15 ke Rp 13,4 juta. Stok 128GB menipis, diprediksi naik lagi saat iPhone 17 masuk.",
+    "date": "28 Sep 2026",
+    "read": "3 mnt"
+  },
+  {
+    "id": 4,
+    "tag": "VS",
+    "title": "Adu kamera malam: Xiaomi 15 vs vivo V40 vs iPhone 16 Pro Max",
+    "desc": "Uji blind test 1.200 pembaca: Xiaomi 15 menang detail, vivo V40 menang skin tone, iPhone menang video. Lihat sampel full-res.",
+    "date": "25 Sep 2026",
+    "read": "10 mnt"
+  },
+  {
+    "id": 5,
+    "tag": "TIPS",
+    "title": "5 setting wajib setelah beli HP baru agar baterai 2x awet",
+    "desc": "Matikan 5G always-on, batasi background, aktifkan adaptive charging, dan kalibrasi baterai Si/C baru. Berlaku untuk semua HP di database.",
+    "date": "22 Sep 2026",
+    "read": "5 mnt"
+  },
+  {
+    "id": 6,
+    "tag": "LAUNCH",
+    "title": "Infinix GT 30 Pro rilis? Bocoran 144Hz + Dimensity 8350",
+    "desc": "Sertifikasi TKDN sudah lolos, harga diprediksi Rp 3,9 juta. Lampu Mecha kini RGB penuh mengelilingi kamera.",
+    "date": "20 Sep 2026",
+    "read": "3 mnt"
+  }
+]

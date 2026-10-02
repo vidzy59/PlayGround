@@ -1,0 +1,1480 @@
+[
+  {
+    "id": "s25-ultra",
+    "name": "Galaxy S25 Ultra",
+    "brand": "Samsung",
+    "tagline": "AI Flagship dengan S Pen & Snapdragon 8 Elite",
+    "announced": "Jan 2025",
+    "status": "Tersedia",
+    "price": 21999000,
+    "oldPrice": 23999000,
+    "priceHistory": [
+      23999,
+      23499,
+      22999,
+      22699,
+      22299,
+      21999
+    ],
+    "colors": [
+      {
+        "name": "Titanium Black",
+        "hex": "#23262b"
+      },
+      {
+        "name": "Titanium Gray",
+        "hex": "#8a8f98"
+      },
+      {
+        "name": "Titanium Whitesilver",
+        "hex": "#e8e9eb"
+      },
+      {
+        "name": "Titanium Blue",
+        "hex": "#3b5bdb"
+      }
+    ],
+    "rating": 4.8,
+    "votes": 2841,
+    "hits": 19230,
+    "misses": 1120,
+    "popularity": 98,
+    "views": "2,1 jt",
+    "antutu": 2180,
+    "geekSingle": 3220,
+    "geekMulti": 10250,
+    "batteryTest": 16.2,
+    "displaySize": 6.9,
+    "displayType": "Dynamic AMOLED 2X, QHD+, 120Hz, 2600 nits",
+    "refresh": 120,
+    "resolution": "3120 x 1440",
+    "chipset": "Snapdragon 8 Elite for Galaxy (3nm)",
+    "cpu": "Octa-core 4.47GHz",
+    "gpu": "Adreno 830",
+    "ram": [
+      12
+    ],
+    "storage": [
+      256,
+      512,
+      1024
+    ],
+    "rear": "200MP + 50MP UW + 50MP Periskop 5x + 10MP Tele 3x",
+    "rearMp": 200,
+    "front": "12MP",
+    "frontMp": 12,
+    "video": "8K@30fps, 4K@120fps",
+    "battery": 5000,
+    "charging": "45W kabel, 15W wireless, 4.5W reverse",
+    "os": "Android 15, One UI 7 (7 thn update)",
+    "weight": 218,
+    "thickness": 8.2,
+    "build": "Titanium + Gorilla Armor 2, IP68",
+    "sim": "Dual SIM + eSIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "Ultrasonic in-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Kamera 200MP terbaik di kelasnya, zoom 5x jernih",
+      "Layar anti-reflektif paling terang",
+      "S Pen + Galaxy AI sangat matang",
+      "Update 7 tahun"
+    ],
+    "cons": [
+      "Harga tinggi",
+      "Charging 45W kalah dari rival China",
+      "Bodi besar, berat"
+    ],
+    "keySpecs": [
+      "6.9\" AMOLED 120Hz",
+      "SD 8 Elite",
+      "200MP OIS",
+      "5000 mAh 45W"
+    ]
+  },
+  {
+    "id": "iphone-16-promax",
+    "name": "iPhone 16 Pro Max",
+    "brand": "Apple",
+    "tagline": "Titanium, A18 Pro & Camera Control",
+    "announced": "Sep 2024",
+    "status": "Tersedia",
+    "price": 22999000,
+    "oldPrice": 24999000,
+    "priceHistory": [
+      24999,
+      24500,
+      23999,
+      23600,
+      23200,
+      22999
+    ],
+    "colors": [
+      {
+        "name": "Black Titanium",
+        "hex": "#2b2b2d"
+      },
+      {
+        "name": "Desert Titanium",
+        "hex": "#c2a77d"
+      },
+      {
+        "name": "White Titanium",
+        "hex": "#ececec"
+      },
+      {
+        "name": "Natural Titanium",
+        "hex": "#a89e93"
+      }
+    ],
+    "rating": 4.9,
+    "votes": 3120,
+    "hits": 22100,
+    "misses": 980,
+    "popularity": 99,
+    "views": "2,8 jt",
+    "antutu": 1920,
+    "geekSingle": 3450,
+    "geekMulti": 8570,
+    "batteryTest": 18.5,
+    "displaySize": 6.9,
+    "displayType": "LTPO Super Retina XDR OLED, 120Hz, 2000 nits",
+    "refresh": 120,
+    "resolution": "2868 x 1320",
+    "chipset": "Apple A18 Pro (3nm)",
+    "cpu": "Hexa-core",
+    "gpu": "Apple GPU 6-core",
+    "ram": [
+      8
+    ],
+    "storage": [
+      256,
+      512,
+      1024
+    ],
+    "rear": "48MP + 48MP UW + 12MP Tetraprism 5x",
+    "rearMp": 48,
+    "front": "12MP TrueDepth",
+    "frontMp": 12,
+    "video": "4K@120fps Dolby Vision",
+    "battery": 4685,
+    "charging": "25W MagSafe, PD 50% in 30 mnt",
+    "os": "iOS 18",
+    "weight": 227,
+    "thickness": 8.3,
+    "build": "Titanium + Ceramic Shield, IP68",
+    "sim": "Dual eSIM / Nano+eSIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "Face ID",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Video terbaik di HP manapun",
+      "Baterai iPhone paling awet",
+      "Build titanium premium",
+      "Ekosistem Apple"
+    ],
+    "cons": [
+      "Harga paling mahal",
+      "Charging lambat",
+      "AI Apple masih bertahap"
+    ],
+    "keySpecs": [
+      "6.9\" OLED 120Hz",
+      "A18 Pro",
+      "48MP + 5x Tele",
+      "Baterai 33 jam video"
+    ]
+  },
+  {
+    "id": "xiaomi-15",
+    "name": "Xiaomi 15",
+    "brand": "Xiaomi",
+    "tagline": "Compact flagship Leica + SD 8 Elite",
+    "announced": "Mar 2025",
+    "status": "Tersedia",
+    "price": 9999000,
+    "oldPrice": 10999000,
+    "priceHistory": [
+      10999,
+      10699,
+      10499,
+      10299,
+      10199,
+      9999
+    ],
+    "colors": [
+      {
+        "name": "Black",
+        "hex": "#1c1c1e"
+      },
+      {
+        "name": "White",
+        "hex": "#f2f2f2"
+      },
+      {
+        "name": "Liquid Silver",
+        "hex": "#c9d1d9"
+      },
+      {
+        "name": "Green",
+        "hex": "#1d5c4d"
+      }
+    ],
+    "rating": 4.7,
+    "votes": 1980,
+    "hits": 12400,
+    "misses": 640,
+    "popularity": 92,
+    "views": "1,4 jt",
+    "antutu": 2140,
+    "geekSingle": 3150,
+    "geekMulti": 9900,
+    "batteryTest": 14.8,
+    "displaySize": 6.36,
+    "displayType": "LTPO AMOLED, 1.5K, 120Hz, 3200 nits",
+    "refresh": 120,
+    "resolution": "2670 x 1200",
+    "chipset": "Snapdragon 8 Elite (3nm)",
+    "cpu": "Octa-core 4.32GHz",
+    "gpu": "Adreno 830",
+    "ram": [
+      12
+    ],
+    "storage": [
+      256,
+      512
+    ],
+    "rear": "50MP Leica + 50MP UW + 50MP Tele 2.6x OIS",
+    "rearMp": 50,
+    "front": "32MP",
+    "frontMp": 32,
+    "video": "8K@30fps",
+    "battery": 5240,
+    "charging": "90W turbo, 50W wireless",
+    "os": "Android 15, HyperOS 2",
+    "weight": 191,
+    "thickness": 8.1,
+    "build": "Aluminium + Shield Glass, IP68",
+    "sim": "Dual SIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "Ultrasonic in-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Flagship paling compact & ringan",
+      "Kamera Leica konsisten",
+      "Charging 90W penuh ~40 mnt",
+      "Harga flagship paling masuk akal"
+    ],
+    "cons": [
+      "Zoom hanya 2.6x",
+      "Tanpa slot microSD",
+      "Bloatware HyperOS"
+    ],
+    "keySpecs": [
+      "6.36\" AMOLED 120Hz",
+      "SD 8 Elite",
+      "Leica 50MP OIS",
+      "5240 mAh 90W"
+    ]
+  },
+  {
+    "id": "poco-x7-pro",
+    "name": "POCO X7 Pro",
+    "brand": "Xiaomi",
+    "tagline": "Raja performa mid-range, Dimensity 8400 Ultra",
+    "announced": "Jan 2025",
+    "status": "Tersedia",
+    "price": 4799000,
+    "oldPrice": 5499000,
+    "priceHistory": [
+      5499,
+      5299,
+      5099,
+      4999,
+      4899,
+      4799
+    ],
+    "colors": [
+      {
+        "name": "Black",
+        "hex": "#17181c"
+      },
+      {
+        "name": "Yellow",
+        "hex": "#f5c518"
+      },
+      {
+        "name": "Green",
+        "hex": "#1f6f4a"
+      }
+    ],
+    "rating": 4.6,
+    "votes": 3420,
+    "hits": 18900,
+    "misses": 890,
+    "popularity": 96,
+    "views": "1,9 jt",
+    "antutu": 1680,
+    "geekSingle": 1610,
+    "geekMulti": 6380,
+    "batteryTest": 15.4,
+    "displaySize": 6.67,
+    "displayType": "AMOLED CrystalRes 1.5K, 120Hz, 3200 nits",
+    "refresh": 120,
+    "resolution": "2712 x 1220",
+    "chipset": "Dimensity 8400 Ultra (4nm)",
+    "cpu": "Octa-core 3.25GHz",
+    "gpu": "Mali-G720",
+    "ram": [
+      8,
+      12
+    ],
+    "storage": [
+      256,
+      512
+    ],
+    "rear": "50MP Sony IMX882 OIS + 8MP UW",
+    "rearMp": 50,
+    "front": "20MP",
+    "frontMp": 20,
+    "video": "4K@60fps",
+    "battery": 6000,
+    "charging": "90W turbo",
+    "os": "Android 15, HyperOS 2",
+    "weight": 195,
+    "thickness": 8.3,
+    "build": "Plastik + Gorilla Glass 7i, IP68",
+    "sim": "Dual SIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "In-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Performa setara flagship 2x lipat harganya",
+      "Baterai 6000 mAh awet",
+      "Layar 1.5K cerah",
+      "IP68 di kelasnya langka"
+    ],
+    "cons": [
+      "Kamera ultrawide biasa saja",
+      "Tanpa jack 3.5mm",
+      "Update OS 3 tahun saja"
+    ],
+    "keySpecs": [
+      "6.67\" AMOLED 120Hz",
+      "Dimensity 8400 Ultra",
+      "50MP OIS",
+      "6000 mAh 90W"
+    ]
+  },
+  {
+    "id": "redmi-note-14-pro",
+    "name": "Redmi Note 14 Pro 5G",
+    "brand": "Xiaomi",
+    "tagline": "Mid-range all-rounder kamera 200MP",
+    "announced": "Jan 2025",
+    "status": "Tersedia",
+    "price": 4199000,
+    "oldPrice": 4699000,
+    "priceHistory": [
+      4699,
+      4599,
+      4499,
+      4399,
+      4299,
+      4199
+    ],
+    "colors": [
+      {
+        "name": "Midnight Black",
+        "hex": "#1a1a1e"
+      },
+      {
+        "name": "Lavender Purple",
+        "hex": "#b9a7e6"
+      },
+      {
+        "name": "Ivory White",
+        "hex": "#f5f1e8"
+      }
+    ],
+    "rating": 4.5,
+    "votes": 2760,
+    "hits": 15200,
+    "misses": 1100,
+    "popularity": 90,
+    "views": "1,6 jt",
+    "antutu": 750,
+    "geekSingle": 1120,
+    "geekMulti": 3120,
+    "batteryTest": 15.9,
+    "displaySize": 6.67,
+    "displayType": "AMOLED 1.5K, 120Hz, 3000 nits, Gorilla Victus 2",
+    "refresh": 120,
+    "resolution": "2712 x 1220",
+    "chipset": "Dimensity 7300 Ultra (4nm)",
+    "cpu": "Octa-core 2.5GHz",
+    "gpu": "Mali-G615",
+    "ram": [
+      8,
+      12
+    ],
+    "storage": [
+      256,
+      512
+    ],
+    "rear": "200MP Samsung HP3 OIS + 8MP UW + 2MP macro",
+    "rearMp": 200,
+    "front": "32MP",
+    "frontMp": 32,
+    "video": "4K@30fps",
+    "battery": 5110,
+    "charging": "45W turbo",
+    "os": "Android 14, HyperOS",
+    "weight": 190,
+    "thickness": 8.4,
+    "build": "Gorilla Victus 2 + IP68",
+    "sim": "Dual SIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "In-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Kamera 200MP detail tinggi",
+      "Layar Victus 2 + IP68",
+      "Desain premium",
+      "Harga turun terus"
+    ],
+    "cons": [
+      "Chipset bukan untuk gaming berat",
+      "Charging 45W saja",
+      "Speaker kurang nendang"
+    ],
+    "keySpecs": [
+      "6.67\" AMOLED 120Hz",
+      "Dimensity 7300 Ultra",
+      "200MP OIS",
+      "5110 mAh 45W"
+    ]
+  },
+  {
+    "id": "samsung-a55",
+    "name": "Galaxy A55 5G",
+    "brand": "Samsung",
+    "tagline": "Mid-range Samsung paling laris",
+    "announced": "Mar 2024",
+    "status": "Tersedia",
+    "price": 5499000,
+    "oldPrice": 6299000,
+    "priceHistory": [
+      6299,
+      6099,
+      5899,
+      5799,
+      5599,
+      5499
+    ],
+    "colors": [
+      {
+        "name": "Awesome Navy",
+        "hex": "#2c3e70"
+      },
+      {
+        "name": "Awesome Lilac",
+        "hex": "#c3b2e8"
+      },
+      {
+        "name": "Awesome Iceblue",
+        "hex": "#bfe3f0"
+      },
+      {
+        "name": "Awesome Lemon",
+        "hex": "#f4e588"
+      }
+    ],
+    "rating": 4.5,
+    "votes": 2540,
+    "hits": 14800,
+    "misses": 1020,
+    "popularity": 89,
+    "views": "1,5 jt",
+    "antutu": 730,
+    "geekSingle": 1080,
+    "geekMulti": 2950,
+    "batteryTest": 16.8,
+    "displaySize": 6.6,
+    "displayType": "Super AMOLED, FHD+, 120Hz, 1000 nits",
+    "refresh": 120,
+    "resolution": "2340 x 1080",
+    "chipset": "Exynos 1480 (4nm)",
+    "cpu": "Octa-core 2.75GHz",
+    "gpu": "Xclipse 530",
+    "ram": [
+      8,
+      12
+    ],
+    "storage": [
+      128,
+      256
+    ],
+    "rear": "50MP OIS + 12MP UW + 5MP macro",
+    "rearMp": 50,
+    "front": "32MP",
+    "frontMp": 32,
+    "video": "4K@30fps",
+    "battery": 5000,
+    "charging": "25W",
+    "os": "Android 14, One UI 6.1 (4+5 thn update)",
+    "weight": 213,
+    "thickness": 8.2,
+    "build": "Metal frame + Gorilla Victus+, IP67",
+    "sim": "Dual SIM + microSD",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP67",
+    "fingerprint": "In-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Update terpanjang di kelasnya",
+      "Build metal + Victus+",
+      "Kamera OIS stabil",
+      "Ada microSD"
+    ],
+    "cons": [
+      "Charging 25W lambat",
+      "Exynos kurang efisien gaming",
+      "Bodi agak berat"
+    ],
+    "keySpecs": [
+      "6.6\" Super AMOLED 120Hz",
+      "Exynos 1480",
+      "50MP OIS",
+      "5000 mAh 25W"
+    ]
+  },
+  {
+    "id": "oppo-reno13",
+    "name": "OPPO Reno13 5G",
+    "brand": "OPPO",
+    "tagline": "AI Portrait + desain butterfly premium",
+    "announced": "Jan 2025",
+    "status": "Tersedia",
+    "price": 8999000,
+    "oldPrice": 9499000,
+    "priceHistory": [
+      9499,
+      9399,
+      9299,
+      9199,
+      9099,
+      8999
+    ],
+    "colors": [
+      {
+        "name": "Plume Purple",
+        "hex": "#c9b6f2"
+      },
+      {
+        "name": "Graphite Grey",
+        "hex": "#3a3d42"
+      }
+    ],
+    "rating": 4.4,
+    "votes": 1320,
+    "hits": 8600,
+    "misses": 540,
+    "popularity": 82,
+    "views": "890 rb",
+    "antutu": 1400,
+    "geekSingle": 1490,
+    "geekMulti": 5120,
+    "batteryTest": 15.1,
+    "displaySize": 6.59,
+    "displayType": "AMOLED 1.5K, 120Hz, 1200 nits",
+    "refresh": 120,
+    "resolution": "2760 x 1256",
+    "chipset": "Dimensity 8350 (4nm)",
+    "cpu": "Octa-core 3.35GHz",
+    "gpu": "Mali-G615",
+    "ram": [
+      12
+    ],
+    "storage": [
+      256,
+      512
+    ],
+    "rear": "50MP IMX882 OIS + 8MP UW + 2MP mono",
+    "rearMp": 50,
+    "front": "50MP AF",
+    "frontMp": 50,
+    "video": "4K@60fps",
+    "battery": 5600,
+    "charging": "80W SUPERVOOC",
+    "os": "Android 15, ColorOS 15",
+    "weight": 181,
+    "thickness": 7.2,
+    "build": "Aluminium + IP69",
+    "sim": "Dual SIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP69",
+    "fingerprint": "In-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Desain tipis ringan 181g",
+      "Selfie 50MP AF jernih",
+      "Baterai 5600 mAh + 80W",
+      "IP69 pertama di Reno"
+    ],
+    "cons": [
+      "Tidak ada telefoto",
+      "Harga di atas rival spek mirip",
+      "ColorOS banyak fitur duplikat"
+    ],
+    "keySpecs": [
+      "6.59\" AMOLED 120Hz",
+      "Dimensity 8350",
+      "50MP OIS",
+      "5600 mAh 80W"
+    ]
+  },
+  {
+    "id": "vivo-v40",
+    "name": "vivo V40 5G",
+    "brand": "vivo",
+    "tagline": "Zeiss portrait + baterai jumbo tipis",
+    "announced": "Sep 2024",
+    "status": "Tersedia",
+    "price": 6499000,
+    "oldPrice": 6999000,
+    "priceHistory": [
+      6999,
+      6899,
+      6799,
+      6699,
+      6599,
+      6499
+    ],
+    "colors": [
+      {
+        "name": "Stellar Silver",
+        "hex": "#cfd3dc"
+      },
+      {
+        "name": "Nebula Purple",
+        "hex": "#7d6bb5"
+      },
+      {
+        "name": "Sunglow Peach",
+        "hex": "#f0b48a"
+      }
+    ],
+    "rating": 4.6,
+    "votes": 1870,
+    "hits": 11300,
+    "misses": 620,
+    "popularity": 86,
+    "views": "1,1 jt",
+    "antutu": 830,
+    "geekSingle": 1180,
+    "geekMulti": 3250,
+    "batteryTest": 17.2,
+    "displaySize": 6.78,
+    "displayType": "AMOLED 1.5K, 120Hz, 4500 nits",
+    "refresh": 120,
+    "resolution": "2800 x 1260",
+    "chipset": "Snapdragon 7 Gen 3 (4nm)",
+    "cpu": "Octa-core 2.63GHz",
+    "gpu": "Adreno 720",
+    "ram": [
+      8,
+      12
+    ],
+    "storage": [
+      256,
+      512
+    ],
+    "rear": "50MP Zeiss OIS + 50MP Zeiss UW",
+    "rearMp": 50,
+    "front": "50MP Zeiss AF",
+    "frontMp": 50,
+    "video": "4K@30fps",
+    "battery": 5500,
+    "charging": "80W FlashCharge",
+    "os": "Android 14, Funtouch 14",
+    "weight": 190,
+    "thickness": 7.6,
+    "build": "IP68",
+    "sim": "Dual SIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "In-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Kamera Zeiss depan-belakang 50MP",
+      "Layar 4500 nits terang",
+      "Tipis tapi baterai 5500",
+      "Portrait malam bagus"
+    ],
+    "cons": [
+      "Chipset mid, bukan gaming",
+      "Ultrawide tanpa AF makro",
+      "Funtouch iklan"
+    ],
+    "keySpecs": [
+      "6.78\" AMOLED 120Hz",
+      "SD 7 Gen 3",
+      "Zeiss 50MP OIS",
+      "5500 mAh 80W"
+    ]
+  },
+  {
+    "id": "realme-13-pro-plus",
+    "name": "realme 13 Pro+ 5G",
+    "brand": "realme",
+    "tagline": "Periskop 3x + HyperImage AI",
+    "announced": "Sep 2024",
+    "status": "Tersedia",
+    "price": 5999000,
+    "oldPrice": 6499000,
+    "priceHistory": [
+      6499,
+      6399,
+      6299,
+      6199,
+      6099,
+      5999
+    ],
+    "colors": [
+      {
+        "name": "Monet Gold",
+        "hex": "#d9b98a"
+      },
+      {
+        "name": "Emerald Green",
+        "hex": "#1e5c4e"
+      }
+    ],
+    "rating": 4.4,
+    "votes": 1540,
+    "hits": 9200,
+    "misses": 710,
+    "popularity": 80,
+    "views": "980 rb",
+    "antutu": 600,
+    "geekSingle": 950,
+    "geekMulti": 2850,
+    "batteryTest": 15.6,
+    "displaySize": 6.7,
+    "displayType": "AMOLED curved, FHD+, 120Hz, 2000 nits",
+    "refresh": 120,
+    "resolution": "2412 x 1080",
+    "chipset": "Snapdragon 7s Gen 2 (4nm)",
+    "cpu": "Octa-core 2.4GHz",
+    "gpu": "Adreno 710",
+    "ram": [
+      8,
+      12
+    ],
+    "storage": [
+      256,
+      512
+    ],
+    "rear": "50MP Sony LYT-701 OIS + 50MP Periskop 3x + 8MP UW",
+    "rearMp": 50,
+    "front": "32MP",
+    "frontMp": 32,
+    "video": "4K@30fps",
+    "battery": 5200,
+    "charging": "80W SUPERVOOC",
+    "os": "Android 14, realme UI 5",
+    "weight": 190,
+    "thickness": 8.2,
+    "build": "Vegan leather, IP65",
+    "sim": "Dual SIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP65",
+    "fingerprint": "In-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Satu-satunya periskop 3x di harga 6jt",
+      "Desain Monet premium",
+      "Layar curved",
+      "AI eraser praktis"
+    ],
+    "cons": [
+      "Chipset 7s Gen 2 biasa",
+      "IP65 saja",
+      "Update 2 tahun"
+    ],
+    "keySpecs": [
+      "6.7\" AMOLED Curved",
+      "SD 7s Gen 2",
+      "50MP + Periskop 3x",
+      "5200 mAh 80W"
+    ]
+  },
+  {
+    "id": "infinix-gt-20",
+    "name": "Infinix GT 20 Pro 5G",
+    "brand": "Infinix",
+    "tagline": "Gaming murah dengan lampu Mecha",
+    "announced": "Mei 2024",
+    "status": "Tersedia",
+    "price": 3499000,
+    "oldPrice": 3999000,
+    "priceHistory": [
+      3999,
+      3899,
+      3799,
+      3699,
+      3599,
+      3499
+    ],
+    "colors": [
+      {
+        "name": "Mecha Blue",
+        "hex": "#3a7bd5"
+      },
+      {
+        "name": "Mecha Orange",
+        "hex": "#f2994a"
+      },
+      {
+        "name": "Mecha Silver",
+        "hex": "#bdc3c7"
+      }
+    ],
+    "rating": 4.5,
+    "votes": 2980,
+    "hits": 16500,
+    "misses": 980,
+    "popularity": 88,
+    "views": "1,7 jt",
+    "antutu": 980,
+    "geekSingle": 1230,
+    "geekMulti": 3980,
+    "batteryTest": 13.9,
+    "displaySize": 6.78,
+    "displayType": "AMOLED LTPS, FHD+, 144Hz, 1300 nits",
+    "refresh": 144,
+    "resolution": "2436 x 1080",
+    "chipset": "Dimensity 8200 Ultimate (4nm)",
+    "cpu": "Octa-core 3.1GHz",
+    "gpu": "Mali-G610",
+    "ram": [
+      8,
+      12
+    ],
+    "storage": [
+      256
+    ],
+    "rear": "108MP Samsung HM6 OIS + 2MP macro + 2MP depth",
+    "rearMp": 108,
+    "front": "32MP",
+    "frontMp": 32,
+    "video": "4K@30fps",
+    "battery": 5000,
+    "charging": "45W",
+    "os": "Android 14, XOS 14 (2 thn update)",
+    "weight": 194,
+    "thickness": 8.2,
+    "build": "Plastik, RGB Mecha lighting",
+    "sim": "Dual SIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP54",
+    "fingerprint": "In-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Gaming 90-120fps di harga 3jt",
+      "Layar 144Hz",
+      "RGB + trigger gaming",
+      "Speaker JBL stereo"
+    ],
+    "cons": [
+      "Kamera 108MP tanpa UW",
+      "IP54 rendah",
+      "Update pendek"
+    ],
+    "keySpecs": [
+      "6.78\" AMOLED 144Hz",
+      "Dimensity 8200U",
+      "108MP OIS",
+      "5000 mAh 45W"
+    ]
+  },
+  {
+    "id": "rog-9",
+    "name": "ROG Phone 9 Pro",
+    "brand": "Asus",
+    "tagline": "Ultimate gaming: SD 8 Elite + AniMe Vision",
+    "announced": "Nov 2024",
+    "status": "Tersedia",
+    "price": 18999000,
+    "oldPrice": 19999000,
+    "priceHistory": [
+      19999,
+      19799,
+      19499,
+      19299,
+      19199,
+      18999
+    ],
+    "colors": [
+      {
+        "name": "Phantom Black",
+        "hex": "#151518"
+      },
+      {
+        "name": "Storm White",
+        "hex": "#e9e9e9"
+      }
+    ],
+    "rating": 4.7,
+    "votes": 980,
+    "hits": 7400,
+    "misses": 310,
+    "popularity": 78,
+    "views": "720 rb",
+    "antutu": 2250,
+    "geekSingle": 3180,
+    "geekMulti": 10050,
+    "batteryTest": 17.8,
+    "displaySize": 6.78,
+    "displayType": "LTPO AMOLED, FHD+, 185Hz, 2500 nits",
+    "refresh": 185,
+    "resolution": "2400 x 1080",
+    "chipset": "Snapdragon 8 Elite (3nm)",
+    "cpu": "Octa-core 4.32GHz",
+    "gpu": "Adreno 830",
+    "ram": [
+      16,
+      24
+    ],
+    "storage": [
+      512,
+      1024
+    ],
+    "rear": "50MP Gimbal OIS + 13MP UW + 32MP Tele 3x",
+    "rearMp": 50,
+    "front": "32MP",
+    "frontMp": 32,
+    "video": "8K@30fps",
+    "battery": 5800,
+    "charging": "65W + 15W wireless, bypass charging",
+    "os": "Android 15, ROG UI",
+    "weight": 227,
+    "thickness": 8.9,
+    "build": "AniMe Vision mini-LED, IP68",
+    "sim": "Dual SIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "In-display",
+    "stereo": true,
+    "jack": true,
+    "pros": [
+      "Gaming terkencang + 185Hz",
+      "Jack 3.5mm + bypass charging",
+      "Baterai 5800 awet",
+      "AirTrigger responsif"
+    ],
+    "cons": [
+      "Berat & tebal",
+      "Kamera bukan fokus utama",
+      "Harga flagship"
+    ],
+    "keySpecs": [
+      "6.78\" AMOLED 185Hz",
+      "SD 8 Elite",
+      "50MP Gimbal OIS",
+      "5800 mAh 65W"
+    ]
+  },
+  {
+    "id": "pixel-9",
+    "name": "Google Pixel 9",
+    "brand": "Google",
+    "tagline": "Kamera AI terbaik + 7 tahun update",
+    "announced": "Agu 2024",
+    "status": "Tersedia",
+    "price": 12999000,
+    "oldPrice": 13999000,
+    "priceHistory": [
+      13999,
+      13799,
+      13599,
+      13399,
+      13199,
+      12999
+    ],
+    "colors": [
+      {
+        "name": "Obsidian",
+        "hex": "#202124"
+      },
+      {
+        "name": "Porcelain",
+        "hex": "#f0e8dc"
+      },
+      {
+        "name": "Wintergreen",
+        "hex": "#b8c7b3"
+      },
+      {
+        "name": "Peony",
+        "hex": "#f3b8c6"
+      }
+    ],
+    "rating": 4.6,
+    "votes": 1120,
+    "hits": 8100,
+    "misses": 420,
+    "popularity": 81,
+    "views": "840 rb",
+    "antutu": 1250,
+    "geekSingle": 1950,
+    "geekMulti": 4650,
+    "batteryTest": 14.2,
+    "displaySize": 6.3,
+    "displayType": "OLED Actua, FHD+, 120Hz, 2700 nits",
+    "refresh": 120,
+    "resolution": "2424 x 1080",
+    "chipset": "Google Tensor G4 (4nm)",
+    "cpu": "Octa-core",
+    "gpu": "Mali-G715",
+    "ram": [
+      12
+    ],
+    "storage": [
+      128,
+      256
+    ],
+    "rear": "50MP + 48MP UW",
+    "rearMp": 50,
+    "front": "10.5MP AF",
+    "frontMp": 10,
+    "video": "4K@60fps",
+    "battery": 4700,
+    "charging": "27W + 15W wireless",
+    "os": "Android 14, 7 thn update",
+    "weight": 198,
+    "thickness": 8.5,
+    "build": "Aluminium + Victus 2, IP68",
+    "sim": "Nano + eSIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "In-display ultrasonic",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Fotografi komputasional terbaik",
+      "Gemini AI terintegrasi",
+      "Update 7 tahun",
+      "Compact premium"
+    ],
+    "cons": [
+      "Tensor panas saat gaming",
+      "Charging 27W lambat",
+      "Tidak resmi Indonesia (garansi distributor)"
+    ],
+    "keySpecs": [
+      "6.3\" OLED 120Hz",
+      "Tensor G4",
+      "50MP + 48MP UW",
+      "4700 mAh 27W"
+    ]
+  },
+  {
+    "id": "iphone-15",
+    "name": "iPhone 15",
+    "brand": "Apple",
+    "tagline": "Dynamic Island paling value",
+    "announced": "Sep 2023",
+    "status": "Tersedia",
+    "price": 13499000,
+    "oldPrice": 15999000,
+    "priceHistory": [
+      15999,
+      15499,
+      14999,
+      14499,
+      13999,
+      13499
+    ],
+    "colors": [
+      {
+        "name": "Black",
+        "hex": "#232323"
+      },
+      {
+        "name": "Blue",
+        "hex": "#a7c1d9"
+      },
+      {
+        "name": "Pink",
+        "hex": "#e8c4c4"
+      },
+      {
+        "name": "Yellow",
+        "hex": "#ece6c9"
+      },
+      {
+        "name": "Green",
+        "hex": "#cfd9c8"
+      }
+    ],
+    "rating": 4.7,
+    "votes": 2650,
+    "hits": 17200,
+    "misses": 800,
+    "popularity": 91,
+    "views": "1,8 jt",
+    "antutu": 1450,
+    "geekSingle": 2620,
+    "geekMulti": 6500,
+    "batteryTest": 15.8,
+    "displaySize": 6.1,
+    "displayType": "Super Retina XDR OLED, 2000 nits, Dynamic Island",
+    "refresh": 60,
+    "resolution": "2556 x 1179",
+    "chipset": "Apple A16 Bionic (4nm)",
+    "cpu": "Hexa-core",
+    "gpu": "Apple GPU 5-core",
+    "ram": [
+      6
+    ],
+    "storage": [
+      128,
+      256,
+      512
+    ],
+    "rear": "48MP + 12MP UW",
+    "rearMp": 48,
+    "front": "12MP TrueDepth",
+    "frontMp": 12,
+    "video": "4K@60fps",
+    "battery": 3349,
+    "charging": "20W + 15W MagSafe, USB-C",
+    "os": "iOS 17 → 18",
+    "weight": 171,
+    "thickness": 7.8,
+    "build": "Aluminium + Ceramic Shield, IP68",
+    "sim": "Dual eSIM / Nano+eSIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "Face ID",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Paling ringan di daftar",
+      "Kamera 48MP konsisten",
+      "USB-C",
+      "Nilai jual kembali tinggi"
+    ],
+    "cons": [
+      "Layar masih 60Hz",
+      "Charging lambat",
+      "Tanpa telefoto"
+    ],
+    "keySpecs": [
+      "6.1\" OLED",
+      "A16 Bionic",
+      "48MP",
+      "USB-C, Face ID"
+    ]
+  },
+  {
+    "id": "samsung-s24-fe",
+    "name": "Galaxy S24 FE",
+    "brand": "Samsung",
+    "tagline": "Fan Edition flagship killer",
+    "announced": "Okt 2024",
+    "status": "Tersedia",
+    "price": 7999000,
+    "oldPrice": 9999000,
+    "priceHistory": [
+      9999,
+      9499,
+      8999,
+      8599,
+      8299,
+      7999
+    ],
+    "colors": [
+      {
+        "name": "Graphite",
+        "hex": "#3b3e44"
+      },
+      {
+        "name": "Blue",
+        "hex": "#7aa5d2"
+      },
+      {
+        "name": "Mint",
+        "hex": "#bfe3c8"
+      },
+      {
+        "name": "Yellow",
+        "hex": "#f2d06b"
+      }
+    ],
+    "rating": 4.4,
+    "votes": 1680,
+    "hits": 10400,
+    "misses": 760,
+    "popularity": 84,
+    "views": "1,0 jt",
+    "antutu": 1150,
+    "geekSingle": 2100,
+    "geekMulti": 6400,
+    "batteryTest": 14.9,
+    "displaySize": 6.7,
+    "displayType": "Dynamic AMOLED 2X, FHD+, 120Hz, 1900 nits",
+    "refresh": 120,
+    "resolution": "2340 x 1080",
+    "chipset": "Exynos 2400e (4nm)",
+    "cpu": "Deca-core 3.11GHz",
+    "gpu": "Xclipse 940",
+    "ram": [
+      8
+    ],
+    "storage": [
+      128,
+      256
+    ],
+    "rear": "50MP OIS + 12MP UW + 8MP Tele 3x OIS",
+    "rearMp": 50,
+    "front": "10MP",
+    "frontMp": 10,
+    "video": "8K@24fps",
+    "battery": 4700,
+    "charging": "25W + 15W wireless",
+    "os": "Android 14, One UI 6.1 (4+5 thn)",
+    "weight": 213,
+    "thickness": 8,
+    "build": "Gorilla Victus+ + IP68",
+    "sim": "Dual SIM + eSIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "In-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Telefoto 3x OIS termurah Samsung",
+      "Galaxy AI lengkap",
+      "Layar AMOLED besar",
+      "Update panjang"
+    ],
+    "cons": [
+      "Exynos 2400e throttling",
+      "Charging 25W",
+      "Bezel agak tebal"
+    ],
+    "keySpecs": [
+      "6.7\" AMOLED 120Hz",
+      "Exynos 2400e",
+      "50MP + Tele 3x",
+      "4700 mAh 25W"
+    ]
+  },
+  {
+    "id": "tecno-camon-40",
+    "name": "Tecno Camon 40 Pro 5G",
+    "brand": "Tecno",
+    "tagline": "Kamera malam murah + layar curved",
+    "announced": "Mar 2025",
+    "status": "Tersedia",
+    "price": 3399000,
+    "oldPrice": 3799000,
+    "priceHistory": [
+      3799,
+      3699,
+      3599,
+      3499,
+      3449,
+      3399
+    ],
+    "colors": [
+      {
+        "name": "Emerald Lake Green",
+        "hex": "#1f6f5a"
+      },
+      {
+        "name": "Galaxy Black",
+        "hex": "#1c1e22"
+      }
+    ],
+    "rating": 4.3,
+    "votes": 1240,
+    "hits": 7800,
+    "misses": 590,
+    "popularity": 76,
+    "views": "690 rb",
+    "antutu": 620,
+    "geekSingle": 1020,
+    "geekMulti": 2980,
+    "batteryTest": 15.2,
+    "displaySize": 6.78,
+    "displayType": "AMOLED curved, FHD+, 120Hz",
+    "refresh": 120,
+    "resolution": "2436 x 1080",
+    "chipset": "Dimensity 7300 (4nm)",
+    "cpu": "Octa-core 2.5GHz",
+    "gpu": "Mali-G615",
+    "ram": [
+      8,
+      12
+    ],
+    "storage": [
+      256
+    ],
+    "rear": "50MP Sony OIS + 2MP depth",
+    "rearMp": 50,
+    "front": "50MP Eye-tracking AF",
+    "frontMp": 50,
+    "video": "4K@30fps",
+    "battery": 5200,
+    "charging": "45W",
+    "os": "Android 15, HiOS 15",
+    "weight": 179,
+    "thickness": 7.3,
+    "build": "IP68/IP69 (pro)",
+    "sim": "Dual SIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP68",
+    "fingerprint": "In-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "Termurah dengan layar curved",
+      "Selfie 50MP AF",
+      "IP68 di 3 jutaan",
+      "Ringan tipis"
+    ],
+    "cons": [
+      "Tanpa UW",
+      "Update 2 tahun",
+      "Brand after-sales terbatas"
+    ],
+    "keySpecs": [
+      "6.78\" AMOLED Curved",
+      "Dimensity 7300",
+      "50MP OIS",
+      "5200 mAh 45W"
+    ]
+  },
+  {
+    "id": "iqoo-13",
+    "name": "iQOO 13 5G",
+    "brand": "vivo",
+    "tagline": "Monster gaming SD 8 Elite termurah",
+    "announced": "Des 2024",
+    "status": "Tersedia",
+    "price": 9999000,
+    "oldPrice": 10999000,
+    "priceHistory": [
+      10999,
+      10799,
+      10599,
+      10399,
+      10199,
+      9999
+    ],
+    "colors": [
+      {
+        "name": "Alpha Black",
+        "hex": "#17181c"
+      },
+      {
+        "name": "Legend White",
+        "hex": "#f2f2f2"
+      }
+    ],
+    "rating": 4.7,
+    "votes": 1420,
+    "hits": 9600,
+    "misses": 380,
+    "popularity": 85,
+    "views": "920 rb",
+    "antutu": 2210,
+    "geekSingle": 3190,
+    "geekMulti": 10100,
+    "batteryTest": 16.5,
+    "displaySize": 6.82,
+    "displayType": "LTPO AMOLED 2K, 144Hz, 4500 nits",
+    "refresh": 144,
+    "resolution": "3168 x 1440",
+    "chipset": "Snapdragon 8 Elite (3nm)",
+    "cpu": "Octa-core 4.32GHz",
+    "gpu": "Adreno 830",
+    "ram": [
+      12,
+      16
+    ],
+    "storage": [
+      256,
+      512
+    ],
+    "rear": "50MP IMX921 OIS + 50MP UW + 50MP Tele 2x",
+    "rearMp": 50,
+    "front": "32MP",
+    "frontMp": 32,
+    "video": "8K@30fps",
+    "battery": 6150,
+    "charging": "120W FlashCharge",
+    "os": "Android 15, Funtouch 15",
+    "weight": 207,
+    "thickness": 8,
+    "build": "IP68/IP69",
+    "sim": "Dual SIM",
+    "network": "5G",
+    "nfc": true,
+    "ip": "IP69",
+    "fingerprint": "Ultrasonic in-display",
+    "stereo": true,
+    "jack": false,
+    "pros": [
+      "SD 8 Elite termurah",
+      "Baterai 6150 Si/C + 120W",
+      "Layar 2K 144Hz",
+      "Vapor chamber besar"
+    ],
+    "cons": [
+      "Kamera bukan sekelas Xiaomi 15",
+      "Funtouch bloatware",
+      "Tidak ada wireless charging"
+    ],
+    "keySpecs": [
+      "6.82\" 2K 144Hz",
+      "SD 8 Elite",
+      "50MP OIS x3",
+      "6150 mAh 120W"
+    ]
+  }
+]

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PonselArena — Database Spesifikasi HP</title>
+<meta name="description" content="Database spesifikasi HP: cari, filter, bandingkan, baca review pengguna.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23212121'/><text x='16' y='23' font-size='18' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>P</text></svg>">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#/" style="text-decoration:none">PONSEL<span>ARENA</span><small>SPECIFICATION DATABASE</small></a>
+    <div class="searchwrap">
+      <div class="searchbox" style="flex:1">
+        <input id="q" placeholder="Cari ponsel, chipset, merek..." autocomplete="off">
+        <button id="qBtn" type="button">Cari</button>
+      </div>
+      <div class="suggest" id="suggest" style="display:none"></div>
+    </div>
+  </div>
+</header>
+<nav class="nav"><div class="nav-inner" id="nav"></div></nav>
+<main class="wrap" id="app"><p>Memuat...</p></main>
+<script src="/app.js"></script>
+</body>
+</html>
