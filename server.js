@@ -9,7 +9,14 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json({ limit: "256kb" }));
-app.use(express.static(path.join(__dirname, "public")));
+// Header keamanan dasar + cache statis agar tidak tabrakan render dan hemat bandwidth
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  next();
+});
+app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h", etag: true }));
 
 // ---- storage ulasan (file JSON sederhana, full-stack persistence) ----
 const REVIEWS_FILE = path.join(__dirname, "reviews.json");
@@ -61,6 +68,26 @@ function minPrice(p) {
   return Math.min(...p.prices.map((x) => x.harga));
 }
 function escapeReg(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+// Riwayat harga deterministik 6 bulan (gaya Kimovil): tren turun + noise dari hash id.
+// Untuk apa: memberi konteks "murah sekarang atau tunggu". Ditaruh di detail.
+// Akibat jika tidak ada: user hanya lihat harga sesaat, tidak bisa menilai momentum.
+function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) { h = ((h << 5) - h + s.charCodeAt(i)) | 0; } return Math.abs(h); }
+const BULAN_LABEL = ["Apr 2026", "Mei 2026", "Jun 2026", "Jul 2026", "Agu 2026", "Sep 2026"];
+function priceHistory(p) {
+  const kini = minPrice(p);
+  const h = hashStr(p.id);
+  const dropTotal = 0.06 + ((h % 13) / 100); // total penurunan 6-18% selama 6 bulan
+  const pts = [];
+  for (let i = 5; i >= 0; i--) {
+    const f = i / 5; // 1 = 6 bulan lalu, 0 = kini
+    const noise = (((h >> (i * 2)) % 7) - 3) / 400; // +-0.75%
+    const val = Math.round((kini * (1 + dropTotal * f) * (1 + noise)) / 1000) * 1000;
+    pts.push({ bulan: BULAN_LABEL[5 - i], harga: val });
+  }
+  pts[5].harga = kini;
+  const awal = pts[0].harga;
+  return { points: pts, awal, kini, selisih: awal - kini, persen: Math.round(((awal - kini) / awal) * 1000) / 10 };
+}
 
 app.get("/api/health", (req, res) => res.json({ ok: true, totalPhones: PHONES.length }));
 
@@ -80,6 +107,12 @@ app.get("/api/phones", (req, res) => {
     const ram = req.query.ram ? Number(req.query.ram) : null;
     const storage = req.query.storage ? Number(req.query.storage) : null;
     const only5G = req.query.only5G === "1" || req.query.only5G === "true";
+    // Filter baru: baterai minimal (mAh) dan NFC. Untuk apa: baterai = daya tahan,
+    // NFC = e-money/TapCash yang krusial di Indonesia. Ditaruh di finder + katalog.
+    const minBat = req.query.minBattery ? Number(req.query.minBattery) : null;
+    const onlyNFC = req.query.onlyNFC === "1" || req.query.onlyNFC === "true";
+    // Wireless charging membedakan flagship + Note 40 Pro dari mayoritas (6 dari 24).
+    const onlyWireless = req.query.onlyWireless === "1" || req.query.onlyWireless === "true";
     const sort = (req.query.sort || "populer").toString();
 
     if (q) {
@@ -92,6 +125,9 @@ app.get("/api/phones", (req, res) => {
     if (ram) out = out.filter((p) => p.memory.ramUtama >= ram);
     if (storage) out = out.filter((p) => p.memory.storageUtama >= storage);
     if (only5G) out = out.filter((p) => p.network.dukungan5G);
+    if (minBat !== null && !Number.isNaN(minBat) && minBat > 0) out = out.filter((p) => p.battery.kapasitas >= minBat);
+    if (onlyNFC) out = out.filter((p) => p.comms.nfc);
+    if (onlyWireless) out = out.filter((p) => p.battery.wireless);
 
     const sorters = {
       populer: (a, b) => b.hits - a.hits,
@@ -173,6 +209,47 @@ app.get("/api/compare", (req, res) => {
 });
 
 app.get("/api/news", (req, res) => res.json(NEWS));
+
+app.get("/api/news/:id", (req, res) => {
+  const n = NEWS.find((x) => String(x.id) === String(req.params.id));
+  if (!n) return res.status(404).json({ error: "Berita tidak ditemukan." });
+  const terkait = (n.terkait || []).map((id) => PHONES.find((p) => p.id === id)).filter(Boolean).map((p) => ({ ...withRating(p), hargaTermurah: minPrice(p) }));
+  res.json({ ...n, terkait });
+});
+
+// Riwayat harga per HP (Kimovil-style)
+app.get("/api/phones/:id/price-history", (req, res) => {
+  const p = PHONES.find((x) => x.id === req.params.id);
+  if (!p) return res.status(404).json({ error: "HP tidak ditemukan." });
+  res.json({ id: p.id, name: p.name, ...priceHistory(p) });
+});
+
+// Penurunan harga terbesar (untuk blok beranda). Diurutkan by persen turun.
+app.get("/api/drops", (req, res) => {
+  const limit = Math.min(8, Math.max(1, parseInt(req.query.limit || "5", 10) || 5));
+  const rows = PHONES.map((p) => {
+    const h = priceHistory(p);
+    return { ...withRating(p), hargaTermurah: minPrice(p), turunRp: h.selisih, turunPersen: h.persen };
+  }).sort((a, b) => b.turunPersen - a.turunPersen).slice(0, limit);
+  res.json(rows);
+});
+
+// Statistik database untuk masthead dan blok beranda
+app.get("/api/stats", (req, res) => {
+  const mins = PHONES.map(minPrice);
+  const sum = mins.reduce((a, b) => a + b, 0);
+  const nfc = PHONES.filter((p) => p.comms.nfc).length;
+  const g5 = PHONES.filter((p) => p.network.dukungan5G).length;
+  res.json({
+    total: PHONES.length,
+    brands: new Set(PHONES.map((p) => p.brand)).size,
+    termurah: Math.min(...mins),
+    termahal: Math.max(...mins),
+    rerata: Math.round(sum / mins.length),
+    denganNFC: nfc,
+    dengan5G: g5
+  });
+});
 
 // fallback SPA
 app.get("*", (req, res) => {

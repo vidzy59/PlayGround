@@ -50,14 +50,68 @@
     try { localStorage.setItem("spekhp_fav", JSON.stringify(l)); } catch (e) {}
     return i === -1;
   }
-  /* Ilustrasi datar: tampak depan, bingkai hitam, layar terang, punch-hole. Warna aksen = varian. */
-  function phoneArt(p, w, h, idx) {
-    w = w || 54; h = h || 72; idx = idx || 0;
+  /* Ilustrasi datar dua sisi. Depan: bingkai + layar + kamera (pill untuk iPhone, titik untuk lainnya).
+     Belakang: modul kamera per keluarga desain (bukan satu bentuk generik).
+     Untuk apa: daftar butuh depan (pengenalan), galeri detail butuh belakang (pembeda desain).
+     Flat, tanpa gradasi, agar mirip sketsa arsip bukan render AI. */
+  function lensa(cx, cy, r) {
+    return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#0b0c0e" stroke="#3c4046" stroke-width="1"/>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.52).toFixed(1) + '" fill="#2a3d55"/>' +
+      '<circle cx="' + (cx - r * 0.2).toFixed(1) + '" cy="' + (cy - r * 0.2).toFixed(1) + '" r="' + (r * 0.16).toFixed(1) + '" fill="#9fc3e0"/>';
+  }
+  function lampu(cx, cy, r) {
+    return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#f5e9c8" stroke="#8a7a3a" stroke-width="0.8"/>';
+  }
+  function modulBelakang(p) {
+    var id = p.id || "", brand = p.brand || "";
+    if (id === "iphone-15-pro-max") {
+      return '<rect x="12" y="5" width="22" height="22" rx="6" fill="#202226"/>' +
+        lensa(18.5, 11.5, 3.6) + lensa(27.5, 11.5, 3.6) + lensa(23, 19.5, 3.6) + lampu(28.5, 19.5, 1.6);
+    }
+    if (id === "iphone-13") {
+      return '<rect x="12" y="5" width="20" height="20" rx="5" fill="#202226"/>' +
+        lensa(18, 11, 3.4) + lensa(26, 19, 3.4) + lampu(26.5, 10, 1.4);
+    }
+    if (brand === "Google") {
+      return '<rect x="8" y="8" width="38" height="10" fill="#141518"/>' +
+        lensa(20, 13, 3.2) + lensa(28, 13, 3.2) + (id === "google-pixel-8-pro" ? lensa(35, 13, 3.2) : lampu(35.5, 13, 1.5));
+    }
+    if (id === "samsung-galaxy-z-flip-5") {
+      return '<rect x="12" y="4" width="30" height="20" rx="3" fill="#141518"/>' +
+        '<rect x="15" y="8" width="16" height="8" fill="#2a3d55"/>' +
+        lensa(36, 10, 2.6) + lensa(36, 17, 2.6);
+    }
+    if (brand === "OnePlus") {
+      return '<circle cx="27" cy="15" r="11" fill="#141518"/>' +
+        '<circle cx="27" cy="15" r="11" fill="none" stroke="#3c4046" stroke-width="1"/>' +
+        lensa(23, 12, 3.2) + lensa(31, 12, 3.2) + lensa(27, 19.5, 3.2) + lampu(33.5, 21, 1.3);
+    }
+    if (brand === "Oppo" || brand === "Vivo" || id === "realme-11-pro-plus") {
+      return '<rect x="14" y="4" width="18" height="28" rx="9" fill="#141518"/>' +
+        lensa(23, 12, 3.8) + lensa(23, 22, 3.8) + lampu(30.5, 17, 1.4);
+    }
+    // Samsung non-lipat, Xiaomi, POCO, Redmi, Infinix, Realme C, Pixel non-visor: modul persegi vertikal
+    return '<rect x="12" y="4" width="17" height="27" rx="4" fill="#141518"/>' +
+      lensa(20.5, 11, 3.6) + lensa(20.5, 20, 3.6) + lampu(20.5, 27, 1.5);
+  }
+  function phoneArt(p, w, h, idx, view) {
+    w = w || 54; h = h || 72; idx = idx || 0; view = view || "depan";
     var aksen = (p.colorHex && p.colorHex[idx]) || "#9aa0a6";
-    var gid = "f" + String(p.id).length + String(w) + String(idx);
-    return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 54 72" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + esc(p.name) + '">' +
+    var nama = esc(p.name);
+    if (view === "belakang") {
+      return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 54 72" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tampak belakang ' + nama + '">' +
+        '<rect x="8" y="1" width="38" height="70" rx="6" fill="' + esc(aksen) + '" stroke="#141518" stroke-width="1.5"/>' +
+        '<rect x="10.5" y="3.5" width="33" height="65" rx="4" fill="none" stroke="#000" opacity="0.15"/>' +
+        modulBelakang(p) +
+        '<circle cx="27" cy="58" r="3" fill="none" stroke="#000" opacity="0.25"/>' +
+        "</svg>";
+    }
+    var notch = (p.brand === "Apple")
+      ? '<rect x="20" y="7.5" width="14" height="4" rx="2" fill="#141518"/>'
+      : '<circle cx="27" cy="9.5" r="1.8" fill="#141518"/>';
+    return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 54 72" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tampak depan ' + nama + '">' +
       '<rect x="8" y="1" width="38" height="70" rx="6" fill="#141518"/>' +
-      '<rect x="10.5" y="6" width="33" height="57" rx="3" fill="#f2f4f6"/>' +
+      '<rect x="10.5" y="6" width="33" height="57" rx="3" fill="#f2f4f6"/>' + notch +
       '<rect x="10.5" y="6" width="33" height="9" rx="3" fill="' + esc(aksen) + '"/>' +
       '<rect x="14" y="19" width="20" height="3" fill="#c6ccd2"/>' +
       '<rect x="14" y="24" width="26" height="2.4" fill="#d8dde2"/>' +
@@ -65,9 +119,8 @@
       '<rect x="14" y="36" width="26" height="12" fill="#dde6ef" stroke="#b9c6d4" stroke-width="1"/>' +
       '<rect x="14" y="50" width="12" height="8" fill="#0d5cb6"/>' +
       '<rect x="28" y="50" width="12" height="8" fill="#e8590c"/>' +
-      '<circle cx="27" cy="10.5" r="1.8" fill="#141518"/>' +
       '<rect x="22" y="65" width="10" height="2.4" rx="1.2" fill="#3a3d42"/>' +
-      '<defs><x>' + gid + "</x></defs></svg>";
+      "</svg>";
   }
   function api(url, opts) {
     return fetch(url, opts).then(function (r) {
@@ -133,7 +186,10 @@
       [4, 6, 8, 12, 16].map(function (v) { return '<option value="' + v + '"' + (String(state.ram || "") === String(v) ? " selected" : "") + ">" + v + " GB+</option>"; }).join("") + "</select>" +
       '<label>Memori min</label><select id="fStorage"><option value="">Semua</option>' +
       [128, 256, 512, 1024].map(function (v) { return '<option value="' + v + '"' + (String(state.storage || "") === String(v) ? " selected" : "") + ">" + v + " GB+</option>"; }).join("") + "</select>" +
+      '<label>Baterai min</label><select id="fBat"><option value="">Semua</option>' +
+      [[4000, "4000 mAh+"], [4500, "4500 mAh+"], [5000, "5000 mAh+"]].map(function (o) { return '<option value="' + o[0] + '"' + (String(state.minBattery || "") === String(o[0]) ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select>" +
       '<label class="finder-cek" style="text-transform:none"><input type="checkbox" id="f5g" style="width:auto"' + (state.only5G ? " checked" : "") + "> Hanya 5G</label>" +
+      '<label class="finder-cek" style="text-transform:none"><input type="checkbox" id="fWls" style="width:auto"' + (state.onlyWireless ? " checked" : "") + "> Ada wireless charging</label>" +
       '<button class="tombol tombol-primer tombol" id="fTerapkan" type="button">TERAPKAN FILTER</button>' +
       (compact ? "" : '<button class="tombol" id="fReset" type="button" style="width:100%;margin-top:6px">ATUR ULANG</button>') +
       "</div>";
@@ -167,6 +223,7 @@
     if (r.path === "/phones") return renderCatalog(r.query);
     if (r.path.indexOf("/phone/") === 0) return renderDetail(r.path.split("/")[2]);
     if (r.path === "/compare") return renderCompare(r.query);
+    if (r.path.indexOf("/news/") === 0) return renderNewsDetail(r.path.split("/")[2]);
     if (r.path === "/news") return renderNews();
     if (r.path === "/favorites") return renderFavorites();
     app.innerHTML = '<div class="kosong"><h3>Halaman tidak ditemukan</h3><p><a href="#/">Kembali ke beranda</a></p></div>';
@@ -224,9 +281,10 @@
       api("/api/brands"),
       api("/api/phones?sort=populer&limit=12"),
       api("/api/phones?sort=terbaru&limit=6"),
-      api("/api/news")
+      api("/api/news"),
+      api("/api/drops?limit=4")
     ]).then(function (res) {
-      var brands = res[0], populer = res[1], terbaru = res[2], news = res[3];
+      var brands = res[0], populer = res[1], terbaru = res[2], news = res[3], drops = res[4];
       var murah = populer.data.filter(function (p) { return hargaMin(p) < 5000000; }).slice(0, 4);
       app.innerHTML =
         '<div class="crumbs">Beranda / <b>Arsip ponsel dan pembanding harga</b></div>' +
@@ -234,8 +292,25 @@
         '<div class="badan">' +
         '<div class="blok">' + blokJudul("HP terbaru di database", "Indeks lengkap", "#/phones?sort=terbaru") +
         terbaru.data.map(barisHP).join("") + "</div>" +
+        // Blok turun harga: untuk apa: jawaban "kapan beli". Ditaruh setelah terbaru agar momentum harga terlihat sebelum daftar populer.
+        '<div class="blok">' + blokJudul("Turun harga terbesar", "Semua tipe", "#/phones?sort=termurah") +
+        drops.map(function (p) {
+          return '<div class="baris-hp"><a class="thumb" href="#/phone/' + esc(p.id) + '" tabindex="-1">' + phoneArt(p) + '</a>' +
+            '<div style="min-width:0"><a class="baris-nama" href="#/phone/' + esc(p.id) + '">' + esc(p.name) + "</a>" +
+            '<div class="baris-sub">6 bulan lalu ' + formatIDR(p.hargaTermurah + p.turunRp) + "</div>" +
+            '<div class="baris-spek">Turun <b>' + formatIDR(p.turunRp) + " (" + esc(p.turunPersen) + '%)</b></div></div>' +
+            '<div class="baris-kanan"><div class="harga-merah">' + formatIDR(p.hargaTermurah) + '</div><div class="harga-kecil">kini</div></div></div>';
+        }).join("") + "</div>" +
         '<div class="blok">' + blokJudul("HP terpopuler", "Semua populer", "#/phones?sort=populer") +
         populer.data.slice(0, 6).map(barisHP).join("") + "</div>" +
+        // Pintasan budget: untuk apa: mayoritas pembeli Indonesia mulai dari budget, bukan merek.
+        '<div class="blok">' + blokJudul("Cari berdasar budget") +
+        '<div class="budget-grid">' +
+        '<a href="#/phones?maxPrice=2000000"><b>Di bawah 2 jt</b><span>HP kedua dan pelajar</span></a>' +
+        '<a href="#/phones?maxPrice=3500000"><b>Di bawah 3,5 jt</b><span>NFC dan 90Hz+ paling laris</span></a>' +
+        '<a href="#/phones?maxPrice=6000000"><b>Di bawah 6 jt</b><span>Gaming dan kamera OIS</span></a>' +
+        '<a href="#/phones?minPrice=10000000"><b>Flagship 10 jt+</b><span>200MP, titanium, ProRes</span></a>' +
+        "</div></div>" +
         '<div class="blok">' + blokJudul("Komparasi yang sering dibuka") +
         '<div style="padding:8px;font-size:12.5px">' +
         '<div style="padding:5px 0;border-bottom:1px dotted #cfd3d8"><a href="#/compare?ids=poco-x6-pro,xiaomi-redmi-note-13-pro"><b>POCO X6 Pro vs Redmi Note 13 Pro 5G</b></a> <span class="harga-kecil">- beda Rp 500 ribu, beda kelas performa</span></div>' +
@@ -244,7 +319,7 @@
         "</div></div>" +
         '<div class="blok">' + blokJudul("Berita dan panduan", "Semua berita", "#/news") +
         news.slice(0, 3).map(function (n) {
-          return '<div class="berita-baris"><div class="berita-tgl"><b>' + esc(n.tanggal.slice(8, 10)) + "</b>" + bulanTahun(n.tanggal) + '</div><div style="min-width:0"><span class="tag">' + esc(n.kategori) + '</span> <a class="berita-judul" href="#/news">' + esc(n.judul) + '</a><div class="berita-ringkas">' + esc(n.ringkasan) + "</div></div></div>";
+          return '<div class="berita-baris"><div class="berita-tgl"><b>' + esc(n.tanggal.slice(8, 10)) + "</b>" + bulanTahun(n.tanggal) + '</div><div style="min-width:0"><span class="tag">' + esc(n.kategori) + '</span> <a class="berita-judul" href="#/news/' + n.id + '">' + esc(n.judul) + '</a><div class="berita-ringkas">' + esc(n.ringkasan) + "</div></div></div>";
         }).join("") + "</div>" +
         "</div>" +
         '<aside class="rail-kanan">' + railKananHTML(populer.data, murah.length ? murah : populer.data.slice(0, 3)) + "</aside></div>";
@@ -261,7 +336,9 @@
       maxPrice: (document.getElementById("fMax") || { value: "" }).value.trim(),
       ram: (document.getElementById("fRam") || { value: "" }).value,
       storage: (document.getElementById("fStorage") || { value: "" }).value,
-      only5G: !!(document.getElementById("f5g") || { checked: false }).checked
+      minBattery: (document.getElementById("fBat") || { value: "" }).value,
+      only5G: !!(document.getElementById("f5g") || { checked: false }).checked,
+      onlyWireless: !!(document.getElementById("fWls") || { checked: false }).checked
     };
   }
   function ikatFinder(stateAwal, brands) {
@@ -274,7 +351,9 @@
       if (s.maxPrice) p.push("maxPrice=" + encodeURIComponent(s.maxPrice));
       if (s.ram) p.push("ram=" + encodeURIComponent(s.ram));
       if (s.storage) p.push("storage=" + encodeURIComponent(s.storage));
+      if (s.minBattery) p.push("minBattery=" + encodeURIComponent(s.minBattery));
       if (s.only5G) p.push("only5G=1");
+      if (s.onlyWireless) p.push("onlyWireless=1");
       location.hash = "#/phones" + (p.length ? "?" + p.join("&") : "");
     };
     var fs = document.getElementById("fSearch");
@@ -287,13 +366,31 @@
     var state = {
       search: q.search || "", brand: q.brand || "Semua", minPrice: q.minPrice || "",
       maxPrice: q.maxPrice || "", ram: q.ram || "", storage: q.storage || "",
+      minBattery: q.minBattery || "", onlyWireless: q.onlyWireless === "1",
       sort: q.sort || "populer", page: parseInt(q.page || "1", 10) || 1, only5G: q.only5G === "1", limit: 8
     };
     app.innerHTML = '<div class="loading">Memuat katalog...</div>';
     Promise.all([api("/api/brands")]).then(function (r) {
       var brands = r[0];
-      var adaFilter = state.search || state.brand !== "Semua" || state.minPrice || state.maxPrice || state.ram || state.storage || state.only5G;
+      var adaFilter = state.search || state.brand !== "Semua" || state.minPrice || state.maxPrice || state.ram || state.storage || state.only5G || state.minBattery || state.onlyWireless;
       var judulKatalog = adaFilter ? "Hasil penyaringan" : "Semua HP di database";
+      // Chip filter aktif: untuk apa: user tahu apa yang menyaring + hapus per item tanpa reset semua.
+      function chipFilter() {
+        var c = [];
+        if (state.search) c.push({ k: "search", t: 'Cari: "' + state.search + '"' });
+        if (state.brand !== "Semua") c.push({ k: "brand", t: state.brand });
+        if (state.minPrice) c.push({ k: "minPrice", t: "Min " + formatIDR(state.minPrice) });
+        if (state.maxPrice) c.push({ k: "maxPrice", t: "Maks " + formatIDR(state.maxPrice) });
+        if (state.ram) c.push({ k: "ram", t: "RAM " + state.ram + "GB+" });
+        if (state.storage) c.push({ k: "storage", t: "Memori " + state.storage + "GB+" });
+        if (state.minBattery) c.push({ k: "minBattery", t: "Baterai " + state.minBattery + "mAh+" });
+        if (state.only5G) c.push({ k: "only5G", t: "5G" });
+        if (state.onlyWireless) c.push({ k: "onlyWireless", t: "Wireless charging" });
+        if (!c.length) return "";
+        return '<div class="chip-wrap">' + c.map(function (x) {
+          return '<span class="chip">' + esc(x.t) + ' <button type="button" data-chip="' + x.k + '" aria-label="Hapus filter ' + esc(x.t) + '">x</button></span>';
+        }).join("") + "</div>";
+      }
       app.innerHTML = '<div class="crumbs"><a href="#/">Beranda</a> / <b>Katalog HP</b>' +
         (state.brand !== "Semua" ? " / " + esc(state.brand) : "") +
         (state.search ? ' / pencarian "' + esc(state.search) + '"' : "") + "</div>" +
@@ -303,6 +400,7 @@
           return '<div style="padding:2px 0"><a href="#/phones?brand=' + encodeURIComponent(b.brand) + '">' + esc(b.brand) + "</a> <span class=\"harga-kecil\">(" + b.count + ")</span></div>";
         }).join("") + "</div></div></aside>" +
         '<div class="badan"><div class="blok">' + blokJudul(judulKatalog) +
+        '<div id="chipBox">' + chipFilter() + "</div>" +
         '<div class="toolbar-finder"><span class="hasil-info" id="hasilInfo"></span><span style="margin-left:auto"></span>' +
         '<label class="hasil-info" for="fSort">Urutkan:</label><select id="fSort">' +
         [["populer", "Paling dilihat"], ["terbaru", "Rilis terbaru"], ["termurah", "Harga terendah"], ["termahal", "Harga tertinggi"], ["rating", "Rating tertinggi"], ["nama", "Nama A-Z"]].map(function (o) {
@@ -323,8 +421,10 @@
         if (state.maxPrice) p.push("maxPrice=" + encodeURIComponent(state.maxPrice));
         if (state.ram) p.push("ram=" + encodeURIComponent(state.ram));
         if (state.storage) p.push("storage=" + encodeURIComponent(state.storage));
+        if (state.minBattery) p.push("minBattery=" + encodeURIComponent(state.minBattery));
         if (state.sort !== "populer") p.push("sort=" + encodeURIComponent(state.sort));
         if (state.only5G) p.push("only5G=1");
+        if (state.onlyWireless) p.push("onlyWireless=1");
         if (state.page > 1) p.push("page=" + state.page);
         var target = "#/phones" + (p.length ? "?" + p.join("&") : "");
         if (location.hash !== target) { location.hash = target; return true; }
@@ -334,9 +434,32 @@
         var s = bacaFinder();
         state.search = s.search; state.brand = s.brand; state.minPrice = s.minPrice;
         state.maxPrice = s.maxPrice; state.ram = s.ram; state.storage = s.storage;
+        state.minBattery = s.minBattery; state.onlyWireless = s.onlyWireless;
         state.only5G = s.only5G; state.page = 1;
-        if (!dorongHash()) muat();
+        if (!dorongHash()) { document.getElementById("chipBox").innerHTML = chipFilter(); ikatChip(); muat(); }
       };
+      function ikatChip() {
+        var box = document.getElementById("chipBox");
+        if (!box) return;
+        box.querySelectorAll("[data-chip]").forEach(function (b) {
+          b.onclick = function () {
+            var k = b.getAttribute("data-chip");
+            if (k === "search") state.search = "";
+            if (k === "brand") state.brand = "Semua";
+            if (k === "minPrice") state.minPrice = "";
+            if (k === "maxPrice") state.maxPrice = "";
+            if (k === "ram") state.ram = "";
+            if (k === "storage") state.storage = "";
+            if (k === "minBattery") state.minBattery = "";
+            if (k === "only5G") state.only5G = false;
+            if (k === "onlyWireless") state.onlyWireless = false;
+            state.page = 1;
+            if (!dorongHash()) { document.getElementById("chipBox").innerHTML = chipFilter(); ikatChip(); muat(); }
+            else route();
+          };
+        });
+      }
+      ikatChip();
       function muat() {
         var p = ["limit=" + state.limit, "page=" + state.page, "sort=" + encodeURIComponent(state.sort)];
         if (state.search) p.push("search=" + encodeURIComponent(state.search));
@@ -345,7 +468,9 @@
         if (state.maxPrice) p.push("maxPrice=" + encodeURIComponent(state.maxPrice));
         if (state.ram) p.push("ram=" + encodeURIComponent(state.ram));
         if (state.storage) p.push("storage=" + encodeURIComponent(state.storage));
+        if (state.minBattery) p.push("minBattery=" + encodeURIComponent(state.minBattery));
         if (state.only5G) p.push("only5G=1");
+        if (state.onlyWireless) p.push("onlyWireless=1");
         document.getElementById("hasilHP").innerHTML = '<div class="loading">Menyaring...</div>';
         api("/api/phones?" + p.join("&")).then(function (res) {
           document.getElementById("hasilInfo").textContent = res.total + " tipe ditemukan - hal. " + res.page + "/" + res.pages;
@@ -387,6 +512,13 @@
         var p = res[0], similar = res[1];
         var hmin = Math.min.apply(null, p.prices.map(function (x) { return x.harga; }));
         var fav = isFav(p.id);
+        var galWarna = 0, galView = "depan";
+        function gambarGaleri() {
+          document.getElementById("galeriUtama").innerHTML = phoneArt(p, 120, 160, galWarna, galView);
+          document.getElementById("warnaNama").textContent = p.colors[galWarna] + " - tampak " + galView;
+          var btns = app.querySelectorAll("[data-view]");
+          for (var bi = 0; bi < btns.length; bi++) btns[bi].classList.toggle("pilih-view", btns[bi].getAttribute("data-view") === galView);
+        }
         function grup(judul, baris) {
           return '<div class="spek-judul">' + esc(judul) + '</div><table class="spek"><tbody>' +
             baris.map(function (r) {
@@ -399,12 +531,13 @@
           '<div class="judul-hp"><h1>' + esc(p.brand) + " " + esc(p.name.replace(p.brand, "").trim() || p.name) + "</h1>" +
           '<div class="sub">Diumumkan ' + esc(p.launch.diumumkan) + " - Rilis " + esc(p.launch.rilis) + " - Dilihat " + esc(Number(p.hits).toLocaleString("id-ID")) + "x - AnTuTu " + esc(Number(p.antutu).toLocaleString("id-ID")) + "</div></div>" +
           '<div class="jangkar"><a href="#bagian-spek">SPESIFIKASI</a><a href="#bagian-harga">HARGA (' + p.prices.length + ' TOKO)</a><a href="#bagian-opini">OPINI (' + esc(p.ulasan.length) + ')</a><a href="#bagian-plusminus">PLUS MINUS</a></div>' +
-          '<div class="detail-atas"><div class="galeri"><div class="galeri-utama" id="galeriUtama">' + phoneArt(p, 120, 160, 0) + "</div>" +
+          '<div class="detail-atas"><div class="galeri"><div class="lihat-toggle"><button type="button" data-view="depan" class="pilih-view">DEPAN</button><button type="button" data-view="belakang">BELAKANG</button></div><div class="galeri-utama" id="galeriUtama">' + phoneArt(p, 120, 160, 0, "depan") + "</div>" +
           '<div class="warna-pilih">' + p.colors.map(function (c, i) {
             return '<button class="warna-dot' + (i === 0 ? " pilih" : "") + '" data-warna="' + i + '" title="' + esc(c) + '" style="background:' + esc(p.colorHex[i] || "#888") + '" aria-label="' + esc(c) + '"></button>';
-          }).join("") + '</div><div class="warna-nama" id="warnaNama">' + esc(p.colors[0]) + "</div>" +
+          }).join("") + '</div><div class="warna-nama" id="warnaNama">' + esc(p.colors[0]) + " - tampak depan</div>" +
           '<div class="tombol-tumpuk"><button class="tombol tombol-primer" id="btnBanding" type="button">BANDINGKAN HP INI</button>' +
-          '<button class="tombol' + (fav ? " tombol-biru" : "") + '" id="btnFav" type="button">' + (fav ? "TERSIMPAN DI FAVORIT" : "SIMPAN KE FAVORIT") + "</button></div></div>" +
+          '<button class="tombol' + (fav ? " tombol-biru" : "") + '" id="btnFav" type="button">' + (fav ? "TERSIMPAN DI FAVORIT" : "SIMPAN KE FAVORIT") + "</button>" +
+          '<button class="tombol" id="btnSalin" type="button">SALIN TAUTAN HP INI</button></div></div>' +
           '<div class="ringkasan"><div class="judul-blok">Spesifikasi utama</div>' +
           '<table class="kunci-tabel"><tbody>' +
           "<tr><td class=\"k\">Jaringan</td><td>" + esc(p.network.teknologi) + " - " + esc(p.network.sim) + "</td></tr>" +
@@ -437,9 +570,12 @@
           '<div class="scroll-x"><table class="harga"><thead><tr><th>Toko</th><th>Harga</th><th>Stok</th><th>Rating</th><th>Ongkir</th><th>Garansi</th></tr></thead><tbody>' +
           p.prices.slice().sort(function (a, b) { return a.harga - b.harga; }).map(function (x, i) {
             return '<tr' + (i === 0 ? ' class="termurah"' : "") + "><td><b>" + esc(x.toko) + "</b>" + (i === 0 ? ' <span class="lencana">TERMURAH</span>' : "") + "</td><td><b>" + formatIDR(x.harga) + "</b></td><td>" + esc(x.stok) + "</td><td>" + esc(x.ratingToko) + "/5</td><td>" + esc(x.ongkir) + "</td><td>" + esc(x.garansi) + "</td></tr>";
-          }).join("") + "</tbody></table></div></div>" +
+          }).join("") +           "</tbody></table></div></div>" +
+          '<div style="padding:0 12px" id="bagian-tren"><div class="judul-blok">Tren harga 6 bulan</div>' +
+          '<p class="hasil-info">Ringkasan pergerakan harga termurah antar toko. Membantu menilai: beli sekarang atau tunggu.</p>' +
+          '<div class="tren-wrap"><canvas id="trenCanvas" width="640" height="220" aria-label="Grafik tren harga"></canvas><div class="hasil-info" id="trenInfo">Memuat tren...</div></div></div>' +
           '<div style="padding:10px 12px" id="bagian-opini"><div class="judul-blok">Opini pengguna (' + esc(p.ulasan.length) + " tertulis)</div>" +
-          '<div class="opini-ringkas"><span class="opini-skor">' + esc(p.ratingLive) + "</span><span>" + bintangTeks(p.ratingLive) + '<br><span class="hasil-info">' + esc(p.reviewCountLive) + " penilaian masuk</span></span></div>" +
+          '<div class="opini-ringkas"><span class="opini-skor">' + esc(p.ratingLive) + "</span><span>" + bintangTeks(p.ratingLive) + '<br><span class="hasil-info">' + esc(p.reviewCountLive) + " penilaian masuk</span></span><span id=\"distBox\" style=\"flex:1;min-width:200px\"></span></div>" +
           '<div class="form-opini"><b>Tulis opini</b><div id="errUlasan"></div>' +
           '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input id="uNama" maxlength="40" placeholder="Nama (wajib)"><input id="uJudul" maxlength="80" placeholder="Judul (wajib)"></div>' +
           '<div class="rate-pilih" id="uRate">' + [1, 2, 3, 4, 5].map(function (v) {
@@ -459,16 +595,77 @@
           var added = toggleFav(p.id);
           e.target.textContent = added ? "TERSIMPAN DI FAVORIT" : "SIMPAN KE FAVORIT";
         };
+        document.getElementById("btnSalin").onclick = function (e) {
+          var url = location.origin + location.pathname + "#/phone/" + p.id;
+          function done() { e.target.textContent = "TAUTAN TERSALIN"; setTimeout(function () { e.target.textContent = "SALIN TAUTAN HP INI"; }, 2000); }
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, done);
+          else { try { var t = document.createElement("textarea"); t.value = url; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); } catch (err) {} done(); }
+        };
+        app.querySelectorAll("[data-view]").forEach(function (b) {
+          b.onclick = function () { galView = b.getAttribute("data-view"); gambarGaleri(); };
+        });
         app.querySelectorAll("[data-warna]").forEach(function (d) {
           d.onclick = function () {
             app.querySelectorAll("[data-warna]").forEach(function (x) { x.classList.remove("pilih"); });
             d.classList.add("pilih");
-            var wi = parseInt(d.getAttribute("data-warna"), 10);
-            var clone = JSON.parse(JSON.stringify(p));
-            document.getElementById("galeriUtama").innerHTML = phoneArt(clone, 120, 160, wi);
-            document.getElementById("warnaNama").textContent = p.colors[wi];
+            galWarna = parseInt(d.getAttribute("data-warna"), 10);
+            gambarGaleri();
           };
         });
+        // Distribusi rating jujur: hanya dari opini tertulis yang ada, bukan data sintetis.
+        (function distribusi() {
+          var box = document.getElementById("distBox");
+          if (!box) return;
+          if (!p.ulasan.length) { box.innerHTML = '<span class="hasil-info">Belum ada opini tertulis untuk distribusi.</span>'; return; }
+          var cnt = [0, 0, 0, 0, 0, 0];
+          p.ulasan.forEach(function (u) { if (u.rating >= 1 && u.rating <= 5) cnt[u.rating]++; });
+          var max = Math.max(cnt[1], cnt[2], cnt[3], cnt[4], cnt[5], 1);
+          var rows = "";
+          for (var s = 5; s >= 1; s--) {
+            var pct = Math.round((cnt[s] / p.ulasan.length) * 100);
+            rows += '<div class="dist-baris"><span>' + s + '</span><span class="dist-bar"><span style="width:' + Math.max(2, Math.round((cnt[s] / max) * 100)) + '%"></span></span><span>' + cnt[s] + " (" + pct + '%)</span></div>';
+          }
+          box.innerHTML = '<span class="hasil-info">Distribusi ' + p.ulasan.length + " opini tertulis:</span>" + rows;
+        })();
+        // Grafik tren harga (canvas murni, tanpa library).
+        api("/api/phones/" + encodeURIComponent(p.id) + "/price-history").then(function (h) {
+          var info = document.getElementById("trenInfo");
+          if (info) info.innerHTML = "6 bulan lalu <b>" + formatIDR(h.awal) + "</b> - kini <b>" + formatIDR(h.kini) + "</b> - turun <b>" + formatIDR(h.selisih) + " (" + esc(h.persen) + "%)</b>.";
+          gambarTren(h.points);
+        }).catch(function () {
+          var info = document.getElementById("trenInfo");
+          if (info) info.textContent = "Tren harga tidak tersedia.";
+        });
+        function gambarTren(points) {
+          var cv = document.getElementById("trenCanvas");
+          if (!cv || !cv.getContext) return;
+          var ctx = cv.getContext("2d"), W = cv.width, H = cv.height, padL = 78, padB = 26, padT = 12, padR = 10;
+          var vals = points.map(function (x) { return x.harga; });
+          var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+          if (mx === mn) mx = mn + 1;
+          function X(i) { return padL + (i * (W - padL - padR)) / (points.length - 1); }
+          function Y(v) { return padT + (1 - (v - mn) / (mx - mn)) * (H - padT - padB); }
+          ctx.clearRect(0, 0, W, H);
+          ctx.font = "11px Arial"; ctx.fillStyle = "#6b7076"; ctx.strokeStyle = "#d4d7db";
+          for (var g = 0; g <= 3; g++) {
+            var gv = mn + ((mx - mn) * g) / 3, gy = Y(gv);
+            ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(W - padR, gy); ctx.stroke();
+            var jt = gv >= 1000000 ? (Math.round(gv / 100000) / 10) + " jt" : Math.round(gv / 1000) + " rb";
+            ctx.fillText("Rp " + jt, 6, gy + 4);
+          }
+          ctx.beginPath();
+          points.forEach(function (pt, i) { if (i === 0) ctx.moveTo(X(i), Y(pt.harga)); else ctx.lineTo(X(i), Y(pt.harga)); });
+          ctx.strokeStyle = "#0d5cb6"; ctx.lineWidth = 2; ctx.stroke();
+          ctx.lineTo(X(points.length - 1), H - padB); ctx.lineTo(X(0), H - padB); ctx.closePath();
+          ctx.fillStyle = "rgba(13,92,182,0.10)"; ctx.fill();
+          ctx.fillStyle = "#0d5cb6";
+          points.forEach(function (pt, i) { ctx.beginPath(); ctx.arc(X(i), Y(pt.harga), 3.5, 0, 7); ctx.fill(); });
+          ctx.fillStyle = "#333";
+          points.forEach(function (pt, i) { if (i % 2 === 0 || i === points.length - 1) ctx.fillText(pt.bulan, X(i) - 24, H - 8); });
+          var lx = X(points.length - 1);
+          ctx.fillStyle = "#b00020"; ctx.font = "bold 12px Arial";
+          ctx.fillText(formatIDR(points[points.length - 1].harga), Math.min(lx - 30, W - 110), Y(points[points.length - 1].harga) - 8);
+        }
         var ratingDipilih = 5;
         app.querySelectorAll("#uRate button").forEach(function (b) {
           b.onclick = function () {
@@ -536,6 +733,8 @@
           return '<select data-slot="' + i + '" aria-label="Pilihan HP ke-' + (i + 1) + '">' + opsi(ids[i] || "") + "</select>";
         }).join("") + "</div>" +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label class="hasil-info"><input type="checkbox" id="cekBeda"' + (sorotAwal ? " checked" : "") + "> Sorot baris yang nilainya berbeda</label>" +
+        '<button class="tombol tombol-mini" id="btnSalinBanding" type="button">SALIN TAUTAN</button>' +
+        '<button class="tombol tombol-mini" id="btnResetBanding" type="button">RESET</button>' +
         '<span class="hasil-info">Nama baris menempel saat tabel digeser di layar kecil.</span></div>' +
         '<div id="hasilBanding" style="margin-top:10px"></div></div>';
       app.querySelectorAll("[data-slot]").forEach(function (sel) {
@@ -545,6 +744,13 @@
           location.hash = hashUntuk(ids.filter(Boolean), c && c.checked);
         };
       });
+      document.getElementById("btnResetBanding").onclick = function () { location.hash = "#/compare"; };
+      document.getElementById("btnSalinBanding").onclick = function (e) {
+        var url = location.href;
+        function done() { e.target.textContent = "TERSALIN"; setTimeout(function () { e.target.textContent = "SALIN TAUTAN"; }, 2000); }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, done);
+        else done();
+      };
       var cek = document.getElementById("cekBeda");
       function muat(sorot) {
         var list = ids.filter(Boolean);
@@ -668,20 +874,30 @@
     app.innerHTML = '<div class="loading">Memuat berita...</div>';
     api("/api/news").then(function (news) {
       app.innerHTML = '<div class="crumbs"><a href="#/">Beranda</a> / <b>Berita dan panduan</b></div>' +
-        '<div style="padding:10px 12px"><div class="judul-blok">Berita dan panduan</div>' +
+        '<div style="padding:10px 12px"><div class="judul-blok">Berita dan panduan (' + news.length + ")</div>" +
         news.map(function (n) {
-          return '<div class="berita-baris"><div class="berita-tgl"><b>' + esc(n.tanggal.slice(8, 10)) + "</b>" + bulanTahun(n.tanggal) + '</div><div style="min-width:0"><span class="tag">' + esc(n.kategori) + '</span> <span class="berita-judul">' + esc(n.judul) + '</span><div class="berita-ringkas">' + esc(n.ringkasan) + '</div><div class="berita-isi" style="display:none;font-size:12.5px;margin-top:6px;border-top:1px dotted #cfd3d8;padding-top:6px">' + esc(n.isi) + '</div><div style="margin-top:6px"><button class="tombol tombol-mini" data-buka type="button">BACA SELENGKAPNYA</button></div></div></div>';
+          return '<div class="berita-baris"><div class="berita-tgl"><b>' + esc(n.tanggal.slice(8, 10)) + "</b>" + bulanTahun(n.tanggal) + '</div><div style="min-width:0"><span class="tag">' + esc(n.kategori) + '</span> <a class="berita-judul" href="#/news/' + n.id + '">' + esc(n.judul) + '</a><div class="berita-ringkas">' + esc(n.ringkasan) + '</div><div style="margin-top:6px"><a class="tombol tombol-mini" href="#/news/' + n.id + '">BACA SELENGKAPNYA</a></div></div></div>';
         }).join("") + "</div>";
-      app.querySelectorAll("[data-buka]").forEach(function (b) {
-        b.onclick = function () {
-          var isi = b.closest(".berita-baris").querySelector(".berita-isi");
-          var tutup = isi.style.display !== "none";
-          isi.style.display = tutup ? "none" : "block";
-          b.textContent = tutup ? "BACA SELENGKAPNYA" : "TUTUP";
-        };
-      });
     }).catch(function (err) {
       app.innerHTML = '<div class="error-box">' + esc(err.message) + "</div>";
+    });
+  }
+  // Halaman artikel: untuk apa: tautan dari beranda/katalog bisa dibagikan dan dibaca penuh.
+  // HP terkait: untuk apa: pembaca rumor/panduan langsung lompat ke tipe yang dibahas.
+  function renderNewsDetail(nid) {
+    setNav("news");
+    app.innerHTML = '<div class="loading">Memuat artikel...</div>';
+    api("/api/news/" + encodeURIComponent(nid)).then(function (n) {
+      app.innerHTML = '<div class="crumbs"><a href="#/">Beranda</a> / <a href="#/news">Berita</a> / <b>' + esc(n.kategori) + "</b></div>" +
+        '<div style="padding:10px 12px"><div class="judul-blok">' + esc(n.kategori) + "</div>" +
+        "<h1 style=\"font-size:18px;margin:10px 0 4px\">" + esc(n.judul) + "</h1>" +
+        '<div class="hasil-info">Diterbitkan ' + formatTanggal(n.tanggal) + "</div>" +
+        '<p style="font-size:13px;background:#f4f5f6;border:1px solid #d4d7db;padding:8px 10px">' + esc(n.ringkasan) + "</p>" +
+        '<div style="font-size:13.5px;white-space:pre-line">' + esc(n.isi) + "</div>" +
+        (n.terkait && n.terkait.length ? '<div style="margin-top:12px">' + blokJudul("HP yang dibahas di artikel ini") + n.terkait.map(barisHP).join("") + "</div>" : "") +
+        '<div style="margin-top:10px"><a class="tombol" href="#/news">KEMBALI KE DAFTAR BERITA</a></div></div>';
+    }).catch(function (err) {
+      app.innerHTML = '<div class="error-box">' + esc(err.message) + '</div><p style="padding:0 12px"><a href="#/news">Kembali ke berita</a></p>';
     });
   }
   function renderFavorites() {
@@ -693,9 +909,12 @@
     }
     app.innerHTML = '<div class="loading">Memuat favorit...</div>';
     api("/api/compare?ids=" + ids.slice(0, 12).map(encodeURIComponent).join(",")).then(function (rows) {
+      var banding3 = ids.slice(0, 3).map(encodeURIComponent).join(",");
       app.innerHTML = '<div class="crumbs"><a href="#/">Beranda</a> / <b>Favorit (' + rows.length + ')</b></div>' +
         '<div style="padding:10px 12px"><div class="judul-blok">HP favorit saya</div>' + rows.map(barisHP).join("") +
-        '<div style="margin-top:10px"><button class="tombol" id="hapusFav" type="button">HAPUS SEMUA FAVORIT</button></div></div>';
+        '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
+        (rows.length >= 2 ? '<a class="tombol tombol-primer" href="#/compare?ids=' + banding3 + '">BANDINGKAN ' + Math.min(3, rows.length) + ' FAVORIT PERTAMA</a>' : "") +
+        '<button class="tombol" id="hapusFav" type="button">HAPUS SEMUA FAVORIT</button></div></div>';
       document.getElementById("hapusFav").onclick = function () {
         try { localStorage.removeItem("spekhp_fav"); } catch (e) {}
         renderFavorites();
