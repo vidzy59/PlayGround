@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpekHP Arena - Spesifikasi, Harga dan Komparasi HP</title>
+<meta name="description" content="Database spesifikasi HP, pembanding harga toko Indonesia, komparasi spesifikasi, opini pengguna, dan berita gadget.">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="utilbar">
+  <div class="page-inner utilbar-in">
+    <span id="utilTanggal">Database HP Indonesia - harga dalam Rupiah (IDR)</span>
+    <span class="util-kanan"><a href="#/favorites">Favorit saya</a><i>|</i><a href="#/news">Panduan beli</a><i>|</i><a href="#/compare">Komparator</a></span>
+  </div>
+</div>
+<header class="masthead">
+  <div class="page-inner masthead-in">
+    <a class="brandlogo" href="#/"><span class="bl-biru">SPEK</span><span class="bl-oranye">HP</span><span class="bl-kecil">ARENA</span></a>
+    <div class="masthead-tengah">
+      <div class="searchbar">
+        <input id="cariGlobal" type="text" placeholder="Cari ponsel, merek, atau chipset. Contoh: Galaxy S24, Dimensity 8300" autocomplete="off" aria-label="Cari HP">
+        <button id="cariBtn" type="button">CARI</button>
+        <div class="autocomplete" id="autoBox" role="listbox"></div>
+      </div>
+      <div class="cari-cepat">Populer:
+        <a href="#/phone/samsung-galaxy-s24-ultra">S24 Ultra</a>
+        <a href="#/phone/iphone-15-pro-max">iPhone 15 Pro Max</a>
+        <a href="#/phone/poco-x6-pro">POCO X6 Pro</a>
+        <a href="#/phone/infinix-note-40-pro">Note 40 Pro</a>
+      </div>
+    </div>
+    <div class="masthead-stat" id="mastStat"><b>--</b><span>tipe HP</span></div>
+  </div>
+</header>
+<nav class="navutama">
+  <div class="page-inner navutama-in" id="navUtama">
+    <a href="#/" data-nav="home">BERANDA</a>
+    <a href="#/phones" data-nav="phones">KATALOG HP</a>
+    <a href="#/compare" data-nav="compare">BANDINGKAN</a>
+    <a href="#/news" data-nav="news">BERITA</a>
+    <a href="#/favorites" data-nav="favorites">FAVORIT</a>
+    <span class="nav-kanan">Harga IDR - update berkala</span>
+  </div>
+</nav>
+<div class="brandstrip">
+  <div class="page-inner brandstrip-in">
+    <span class="bs-label">MEREK:</span>
+    <a href="#/phones?brand=Samsung">SAMSUNG</a>
+    <a href="#/phones?brand=Apple">APPLE</a>
+    <a href="#/phones?brand=Xiaomi">XIAOMI</a>
+    <a href="#/phones?brand=Oppo">OPPO</a>
+    <a href="#/phones?brand=Vivo">VIVO</a>
+    <a href="#/phones?brand=Realme">REALME</a>
+    <a href="#/phones?brand=Infinix">INFINIX</a>
+    <a href="#/phones?brand=Google">GOOGLE</a>
+    <a href="#/phones?brand=OnePlus">ONEPLUS</a>
+    <a href="#/phones" class="bs-semua">Semua &raquo;</a>
+  </div>
+</div>
+<div class="page"><div class="page-inner"><main id="app"><div class="loading">Memuat data...</div></main></div></div>
+<footer class="foot">
+  <div class="page-inner foot-in">
+    <div class="foot-kol">
+      <h5>SPEKHP ARENA</h5>
+      <p>Arsip spesifikasi dan pembanding harga ponsel untuk pembeli Indonesia. Spesifikasi merujuk lembar resmi pabrikan. Harga dikumpulkan dari toko resmi dan marketplace dan dapat berubah sewaktu-waktu.</p>
+    </div>
+    <div class="foot-kol">
+      <h5>NAVIGASI</h5>
+      <a href="#/">Beranda</a><a href="#/phones">Katalog HP</a><a href="#/compare">Bandingkan HP</a><a href="#/news">Berita dan tips</a>
+    </div>
+    <div class="foot-kol">
+      <h5>MEREK</h5>
+      <a href="#/phones?brand=Samsung">Samsung</a><a href="#/phones?brand=Xiaomi">Xiaomi</a><a href="#/phones?brand=Apple">Apple</a><a href="#/phones?brand=Oppo">Oppo</a><a href="#/phones?brand=Vivo">Vivo</a>
+    </div>
+    <div class="foot-kol">
+      <h5>BANTUAN</h5>
+      <a href="#/news">Cara cek IMEI</a><a href="#/news">Panduan beli HP second</a><a href="#/favorites">Favorit saya</a>
+    </div>
+  </div>
+  <div class="page-inner foot-copy">SpekHP Arena 2026. Selalu konfirmasi harga dan garansi ke toko sebelum membayar.</div>
+</footer>
+<script src="/app.js"></script>
+</body>
+</html>

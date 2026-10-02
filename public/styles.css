@@ -1,0 +1,222 @@
+/* SpekHP Arena - gaya arsip GSMArena/Kimovil: flat, padat, tabel. Tanpa gradient besar, tanpa radius besar. */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#c9ccd1;color:#222;font:13px/1.5 Arial,Helvetica,sans-serif}
+a{color:#0d5cb6;text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{margin:0;line-height:1.3}
+.page{background:#c9ccd1;padding:10px 0 18px}
+.page-inner{max-width:1060px;margin:0 auto;padding:0 10px;min-width:0}
+#app{background:#fff;border:1px solid #a9adb3;padding:0;min-width:0;overflow:hidden}
+/* utilbar */
+.utilbar{background:#2f3338;color:#c8ccd1;font-size:11px}
+.utilbar-in{display:flex;justify-content:space-between;gap:10px;padding-top:4px;padding-bottom:4px}
+.util-kanan a{color:#e6e8eb;margin:0 4px}
+.util-kanan i{color:#6b7076;font-style:normal}
+/* masthead */
+.masthead{background:#fff;border-bottom:1px solid #a9adb3}
+.masthead-in{display:flex;align-items:center;gap:18px;padding-top:10px;padding-bottom:10px}
+.brandlogo{white-space:nowrap;font-weight:700;font-size:30px;letter-spacing:-.5px}
+.brandlogo:hover{text-decoration:none}
+.bl-biru{color:#0d5cb6}.bl-oranye{color:#e8590c}
+.bl-kecil{display:block;font-size:10px;letter-spacing:4px;color:#6b7076;font-weight:700}
+.masthead-tengah{flex:1 1 auto;min-width:0}
+.searchbar{display:flex;position:relative;max-width:560px}
+.searchbar input{flex:1 1 auto;min-width:0;border:1px solid #8f959c;border-right:0;padding:8px 10px;font-size:13px;outline:none}
+.searchbar input:focus{border-color:#e8590c}
+.searchbar button{border:1px solid #b34700;background:#e8590c;color:#fff;font-weight:700;font-size:12px;padding:0 18px;cursor:pointer;letter-spacing:.5px}
+.searchbar button:hover{background:#c74e0a}
+.cari-cepat{font-size:11px;color:#6b7076;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cari-cepat a{margin:0 5px;color:#0d5cb6}
+.masthead-stat{border:1px solid #d4d7db;background:#f4f5f6;text-align:center;padding:6px 14px;white-space:nowrap}
+.masthead-stat b{display:block;font-size:18px;color:#0d5cb6}
+.masthead-stat span{font-size:10px;color:#6b7076;text-transform:uppercase}
+.autocomplete{position:absolute;top:100%;left:0;right:74px;background:#fff;border:1px solid #8f959c;border-top:0;display:none;z-index:60}
+.autocomplete.tampil{display:block}
+.autocomplete button{display:flex;width:100%;gap:8px;align-items:baseline;padding:7px 9px;border:0;border-bottom:1px solid #eee;background:#fff;cursor:pointer;text-align:left;font-size:12.5px}
+.autocomplete button:hover{background:#f0f4f8}
+.ac-harga{margin-left:auto;color:#b00020;font-weight:700;white-space:nowrap}
+/* nav */
+.navutama{background:#3b3f45}
+.navutama-in{display:flex;align-items:center;gap:2px;overflow-x:auto}
+.navutama-in a{color:#fff;font-size:12px;font-weight:700;padding:10px 14px;white-space:nowrap;letter-spacing:.3px}
+.navutama-in a:hover{background:#2c3034;text-decoration:none}
+.navutama-in a.aktif{background:#e8590c}
+.nav-kanan{margin-left:auto;color:#9aa0a7;font-size:11px;white-space:nowrap;padding-left:12px}
+/* brandstrip */
+.brandstrip{background:#efeff1;border-bottom:1px solid #a9adb3}
+.brandstrip-in{display:flex;align-items:center;gap:2px;overflow-x:auto;padding-top:6px;padding-bottom:6px;font-size:11px}
+.bs-label{color:#6b7076;font-weight:700;margin-right:6px}
+.brandstrip-in a{padding:3px 8px;white-space:nowrap;color:#333;font-weight:700}
+.brandstrip-in a:hover{color:#e8590c}
+.bs-semua{color:#0d5cb6 !important}
+/* tata letak konten */
+.kolom{display:grid;grid-template-columns:186px minmax(0,1fr) 200px;gap:0;align-items:start}
+.kolom-2{display:grid;grid-template-columns:200px minmax(0,1fr);gap:0;align-items:start}
+.rail-kiri{border-right:1px solid #d4d7db;padding:10px;min-width:0}
+.rail-kanan{border-left:1px solid #d4d7db;padding:10px;min-width:0;background:#fafbfc}
+.badan{padding:10px 12px;min-width:0}
+.blok{margin-bottom:14px;min-width:0}
+.judul-blok{background:#e8eaed;border:1px solid #d4d7db;border-bottom:2px solid #e8590c;padding:6px 9px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#222;display:flex;align-items:center;gap:8px}
+.judul-blok a{margin-left:auto;font-size:11px;text-transform:none;letter-spacing:0}
+/* finder */
+.finder-judul{font-size:11px;font-weight:700;color:#fff;background:#3b3f45;padding:6px 8px;text-transform:uppercase}
+.finder-grup{border:1px solid #d4d7db;border-top:0;padding:8px;font-size:12px}
+.finder-grup label{display:block;font-weight:700;font-size:11px;color:#555;margin:7px 0 3px;text-transform:uppercase}
+.finder-grup label:first-child{margin-top:0}
+.finder-grup select,.finder-grup input{width:100%;max-width:100%;padding:6px;border:1px solid #a9adb3;font-size:12px;background:#fff}
+.finder-cek{display:flex;gap:6px;align-items:center;font-size:12px;margin-top:6px}
+.finder-grup .tombol{width:100%;margin-top:8px}
+/* daftar hp baris ala gsmarena */
+.baris-hp{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;padding:8px 6px;border-bottom:1px solid #e3e5e8;align-items:center}
+.baris-hp:hover{background:#f4f7fb}
+.baris-hp .thumb{width:64px;height:80px;border:1px solid #d4d7db;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.baris-nama{font-size:14px;font-weight:700}
+.baris-sub{font-size:11px;color:#6b7076}
+.baris-spek{font-size:12px;color:#333;margin-top:2px}
+.baris-spek b{color:#000}
+.baris-kanan{text-align:right;white-space:nowrap}
+.harga-merah{color:#b00020;font-weight:700;font-size:14px}
+.harga-kecil{font-size:11px;color:#6b7076}
+.skor-kecil{font-size:11px;color:#6b7076;margin-top:2px}
+.rate-num{background:#3f7a3f;color:#fff;font-size:11px;font-weight:700;padding:1px 6px;margin-right:5px}
+.rate-num.sedang{background:#b7791f}.rate-num.rendah{background:#8a8f94}
+.tag5g{font-size:10px;font-weight:700;background:#0d5cb6;color:#fff;padding:1px 5px;margin-left:6px;vertical-align:middle}
+.link-kecil{font-size:11px;white-space:nowrap}
+/* tombol */
+.tombol{border:1px solid #a9adb3;background:#f0f1f3;color:#222;font-weight:700;font-size:12px;padding:7px 12px;cursor:pointer;display:inline-block;text-align:center}
+.tombol:hover{background:#e2e4e7;text-decoration:none;color:#000}
+.tombol-primer{background:#e8590c;border-color:#b34700;color:#fff}
+.tombol-primer:hover{background:#c74e0a;color:#fff}
+.tombol-biru{background:#0d5cb6;border-color:#0a4689;color:#fff}
+.tombol-biru:hover{background:#0a4689;color:#fff}
+.tombol-mini{padding:4px 9px;font-size:11px}
+/* toolbar katalog */
+.crumbs{font-size:11px;color:#6b7076;padding:8px 12px 0}
+.crumbs b{color:#222}
+.toolbar-finder{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0}
+.toolbar-finder select{padding:6px;border:1px solid #a9adb3;font-size:12px;max-width:200px}
+.hasil-info{font-size:11px;color:#6b7076}
+.paginasi{display:flex;gap:4px;flex-wrap:wrap;margin:10px 0}
+.paginasi button,.paginasi span{border:1px solid #a9adb3;background:#fff;font-size:12px;padding:5px 10px;cursor:pointer}
+.paginasi button.aktif{background:#3b3f45;color:#fff;border-color:#3b3f45}
+.paginasi button:disabled{opacity:.45;cursor:default}
+/* detail */
+.judul-hp{background:#f4f5f6;border-bottom:1px solid #d4d7db;padding:10px 12px}
+.judul-hp h1{font-size:19px}
+.judul-hp .sub{font-size:11px;color:#6b7076;margin-top:2px}
+.jangkar{font-size:11px;font-weight:700;background:#3b3f45;color:#fff;padding:6px 12px;display:flex;gap:12px;flex-wrap:wrap}
+.jangkar a{color:#fff}
+.jangkar a:hover{color:#ffb38a}
+.detail-atas{display:grid;grid-template-columns:230px minmax(0,1fr);gap:0;border-bottom:1px solid #d4d7db}
+.galeri{padding:12px;border-right:1px solid #d4d7db;text-align:center;min-width:0}
+.galeri-utama{border:1px solid #d4d7db;background:#fff;min-height:250px;display:flex;align-items:center;justify-content:center;padding:8px}
+.warna-pilih{display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+.warna-dot{width:20px;height:20px;border:1px solid #8f959c;cursor:pointer;padding:0}
+.warna-dot.pilih{outline:2px solid #e8590c;outline-offset:1px}
+.warna-nama{font-size:11px;color:#6b7076;margin-top:4px}
+.tombol-tumpuk{display:grid;gap:6px;margin-top:10px}
+.ringkasan{padding:12px;min-width:0}
+.kunci-tabel{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+.kunci-tabel td{border:1px solid #d4d7db;padding:6px 8px;vertical-align:top}
+.kunci-tabel td.k{width:110px;background:#f4f5f6;font-weight:700;color:#555;font-size:11px;text-transform:uppercase}
+.harga-utama{border:1px solid #c9e2c9;background:#f2f9f2;padding:8px 10px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin:8px 0}
+.harga-utama .besar{font-size:20px;font-weight:700;color:#1c6b1c}
+.harga-utama .ket{font-size:11px;color:#555}
+/* tabel spek */
+.spek-judul{background:#e8eaed;border:1px solid #cfd3d8;border-bottom:0;padding:6px 9px;font-size:12px;font-weight:700;color:#0d5cb6;text-transform:uppercase;margin-top:12px}
+table.spek{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
+table.spek td,table.spek th{border:1px solid #dfe1e4;padding:6px 9px;text-align:left;vertical-align:top}
+table.spek th{width:170px;background:#f4f5f6;color:#444;font-weight:700;font-size:12px}
+/* tabel harga kimovil */
+table.harga{width:100%;border-collapse:collapse;font-size:12.5px}
+table.harga th{background:#f4f5f6;border:1px solid #d4d7db;padding:7px 8px;text-align:left;font-size:11px;text-transform:uppercase;color:#555}
+table.harga td{border:1px solid #dfe1e4;padding:7px 8px;vertical-align:middle}
+tr.termurah td{background:#f2f9f2}
+.lencana{font-size:10px;font-weight:700;padding:1px 6px;border:1px solid #1c6b1c;color:#1c6b1c;white-space:nowrap}
+.lencana-abu{border-color:#8f959c;color:#555}
+.scroll-x{overflow-x:auto;max-width:100%}
+/* pro kontra */
+.prokontra{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.prokontra>div{border:1px solid #d4d7db;padding:8px 10px;font-size:12.5px}
+.prokontra h4{font-size:12px;text-transform:uppercase;margin-bottom:6px}
+.prokontra ul{margin:0;padding-left:16px}
+.pk-pro h4{color:#1c6b1c}.pk-kontra h4{color:#b00020}
+/* opini */
+.opini-ringkas{display:flex;gap:12px;align-items:center;border:1px solid #d4d7db;background:#f4f5f6;padding:10px;margin-bottom:10px;flex-wrap:wrap}
+.opini-skor{font-size:30px;font-weight:700;color:#222}
+.form-opini{border:1px solid #d4d7db;padding:10px;margin-bottom:10px}
+.form-opini input,.form-opini textarea{width:100%;max-width:100%;padding:7px;border:1px solid #a9adb3;font-size:12.5px;margin-bottom:8px}
+.form-opini textarea{min-height:80px;resize:vertical}
+.rate-pilih{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.rate-pilih button{border:1px solid #a9adb3;background:#fff;padding:5px 10px;font-size:12px;cursor:pointer;font-weight:700}
+.rate-pilih button.pilih{background:#3f7a3f;border-color:#2c5a2c;color:#fff}
+.opini-item{border-bottom:1px solid #e3e5e8;padding:8px 0;font-size:12.5px}
+.opini-item small{color:#6b7076}
+/* banding */
+.banding-pilih{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.banding-pilih select{width:100%;max-width:100%;padding:7px;border:1px solid #a9adb3;font-size:12.5px}
+table.banding{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+table.banding td,table.banding th{border:1px solid #d4d7db;padding:7px 8px;vertical-align:top;word-wrap:break-word}
+table.banding td.label{width:150px;background:#f4f5f6;font-weight:700;color:#444;text-align:left}
+table.banding td{text-align:center}
+td.menang{background:#e7f3e7;font-weight:700}
+td.beda{background:#fffaeb}
+/* berita */
+.berita-baris{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;padding:10px 6px;border-bottom:1px solid #e3e5e8}
+.berita-tgl{border:1px solid #d4d7db;background:#f4f5f6;text-align:center;padding:6px 4px;font-size:11px;color:#555}
+.berita-tgl b{display:block;font-size:16px;color:#222}
+.berita-judul{font-size:14px;font-weight:700}
+.berita-ringkas{font-size:12.5px;color:#444}
+.tag{font-size:10px;font-weight:700;background:#0d5cb6;color:#fff;padding:1px 6px;text-transform:uppercase}
+/* kanan rail */
+.ol-pop{margin:0;padding:0;list-style:none;font-size:12px}
+.ol-pop li{padding:6px 0;border-bottom:1px dotted #cfd3d8;display:flex;gap:8px}
+.ol-pop .no{font-weight:700;color:#e8590c;min-width:18px}
+.ol-pop small{display:block;color:#6b7076;font-size:11px}
+/* footer */
+.foot{background:#2f3338;color:#b9bec4;margin:0}
+.foot-in{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:16px;padding-top:18px;padding-bottom:14px}
+.foot h5{color:#fff;font-size:11px;letter-spacing:1px;margin-bottom:8px}
+.foot p,.foot a{font-size:12px;color:#b9bec4}
+.foot a{display:block;margin:3px 0}
+.foot-copy{border-top:1px solid #454a51;padding:10px;font-size:11px;color:#8f959c;text-align:center}
+/* komparator: vonis + baris seksi + kolom label menempel */
+.vonis{border:1px solid #bcd8bc;background:#f4faf4;padding:10px 12px;margin:10px 0;font-size:12.5px}
+.vonis h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;color:#1c6b1c}
+.vonis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.vonis-item{border:1px solid #cfd3d8;background:#fff;padding:6px 9px}
+.vonis-item small{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#6b7076}
+.selisih{display:block;font-size:11px;font-weight:400;color:#6b7076}
+.hapus-link{background:none;border:0;color:#b00020;font-size:11px;cursor:pointer;padding:0;text-decoration:underline}
+tr.seksi-banding td{background:#e8eaed;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0d5cb6;text-align:left}
+table.banding td.label{position:sticky;left:0;z-index:2;box-shadow:1px 0 0 #d4d7db}
+/* util */
+.kosong{padding:26px;text-align:center;color:#6b7076}
+.error-box{background:#fdecec;border:1px solid #f0b6b6;color:#8f1d1d;padding:9px 10px;margin:10px 12px;font-size:12.5px}
+.loading{padding:26px;text-align:center;color:#6b7076}
+.bintang{color:#b7791f;font-weight:700;letter-spacing:1px;font-size:12px}
+/* cegah tabrakan global */
+img,svg,table{max-width:100%}
+input,select,textarea{min-width:0}
+@media(max-width:1000px){
+  .kolom{grid-template-columns:180px minmax(0,1fr)}
+  .rail-kanan{display:none}
+  .kolom-2{grid-template-columns:190px minmax(0,1fr)}
+  .foot-in{grid-template-columns:1fr 1fr}
+}
+@media(max-width:720px){
+  .masthead-in{flex-wrap:wrap}
+  .masthead-stat{display:none}
+  .cari-cepat{display:none}
+  .kolom,.kolom-2{grid-template-columns:minmax(0,1fr)}
+  .rail-kiri{border-right:0;border-bottom:1px solid #d4d7db}
+  .detail-atas{grid-template-columns:minmax(0,1fr)}
+  .galeri{border-right:0;border-bottom:1px solid #d4d7db}
+  .prokontra{grid-template-columns:minmax(0,1fr)}
+  .banding-pilih{grid-template-columns:minmax(0,1fr)}
+  .baris-hp{grid-template-columns:54px minmax(0,1fr)}
+  .baris-kanan{grid-column:2;text-align:left}
+  .nav-kanan{display:none}
+  table.spek th{width:120px}
+}
