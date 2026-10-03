@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const { PHONES, NEWS } = require("./data");
+const { PHONES, NEWS, AFF, ADS } = require("./data");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -197,7 +197,10 @@ app.post("/api/phones/:id/reviews", (req, res) => {
 });
 
 app.get("/api/compare", (req, res) => {
-  const ids = (req.query.ids || "").toString().split(",").map((s) => s.trim()).filter(Boolean).slice(0, 3);
+  /* Batas 12: halaman favorit memakai endpoint ini untuk menampilkan semua favorit,
+     sedangkan UI komparator membatasi 3 slot di sisi frontend. Batas 3 di sini
+     dulu bikin halaman favorit terpotong diam-diam (judul klaim N, tampil 3). */
+  const ids = (req.query.ids || "").toString().split(",").map((s) => s.trim()).filter(Boolean).slice(0, 12);
   if (!ids.length) return res.status(400).json({ error: "Pilih minimal 1 HP." });
   const result = [];
   for (const id of ids) {
@@ -216,6 +219,10 @@ app.get("/api/news/:id", (req, res) => {
   const terkait = (n.terkait || []).map((id) => PHONES.find((p) => p.id === id)).filter(Boolean).map((p) => ({ ...withRating(p), hargaTermurah: minPrice(p) }));
   res.json({ ...n, terkait });
 });
+
+// Config afiliasi + iklan untuk frontend (tanpa data sensitif lain).
+app.get("/api/aff", (req, res) => res.json(AFF || { aktif: false }));
+app.get("/api/ads", (req, res) => res.json(ADS || { aktif: false }));
 
 // Riwayat harga per HP (Kimovil-style)
 app.get("/api/phones/:id/price-history", (req, res) => {

@@ -815,3 +815,44 @@ const NEWS = [
 ];
 
 module.exports = { PHONES, NEWS };
+
+/* ============ PENGHASILAN: AFILIASI MARKETPLACE ============
+   Untuk apa: tombol BELI di tabel harga mengarah ke pencarian HP di marketplace
+   lewat link afiliasi, sehingga tiap pembelian menghasilkan komisi untuk pemilik.
+   Cara pakai:
+   1) Daftar ke Shopee Affiliate / Tokopedia Affiliate / Lazada / Blibli.
+   2) Isi `tag` dengan ID/sub-ID afiliasi masing-masing.
+      Link default di bawah adalah pencarian biasa (tetap berfungsi, tanpa komisi).
+      Agar komisi TERCATAT, ganti `url` dengan format link afiliasi resmi dari
+      dashboard masing-masing (biasanya mengandung ID afiliasi). {q} = nama HP,
+      {tag} = ID afiliasi. Contoh format didokumentasikan di dashboard program.
+   3) Toko yang namanya mengandung kata kunci di bawah otomatis dipetakan ke
+      marketplace-nya; toko lain (official store, Erafone, iBox) fallback ke Shopee. */
+const AFF = {
+  aktif: true,
+  toko: [
+    { kunci: ["shopee"], nama: "Shopee", tag: "", url: "https://shopee.co.id/search?keyword={q}" },
+    { kunci: ["tokopedia", "toped"], nama: "Tokopedia", tag: "", url: "https://www.tokopedia.com/search?st=&q={q}" },
+    { kunci: ["lazada"], nama: "Lazada", tag: "", url: "https://www.lazada.co.id/catalog/?q={q}" },
+    { kunci: ["blibli"], nama: "Blibli", tag: "", url: "https://www.blibli.com/online-storefront/search?searchText={q}" },
+    { kunci: ["erafone"], nama: "Erafone", tag: "", url: "https://www.erafone.com/catalogsearch/result/?q={q}" },
+    { kunci: ["ibox"], nama: "iBox", tag: "", url: "https://ibox.co.id/search?q={q}" },
+    { kunci: ["digimap"], nama: "Digimap", tag: "", url: "https://www.digimap.co.id/search?q={q}" }
+  ],
+  fallback: { nama: "Shopee", tag: "", url: "https://shopee.co.id/search?keyword={q}" }
+};
+
+/* ============ PENGHASILAN: SLOT IKLAN ============
+   Untuk apa: ruang iklan gaya arsip (label IKLAN) di titik yang tidak mengganggu.
+   Cara pakai: isi `client` dengan Publisher ID AdSense (ca-pub-xxxx), dan isi
+   `slot` yang ingin diaktifkan dengan Ad Slot ID. Slot yang kosong otomatis
+   menampilkan kotak "Ruang iklan tersedia" (sekaligus menjual space ke pengiklan
+   langsung). Set `aktif:false` untuk menyembunyikan semua iklan. */
+const ADS = {
+  aktif: true,
+  client: "",
+  slot: { home_feed: "", rail: "", katalog_atas: "", detail_tengah: "", banding_atas: "", berita_atas: "" }
+};
+
+module.exports.AFF = AFF;
+module.exports.ADS = ADS;
