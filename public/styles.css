@@ -171,12 +171,23 @@ tr.termurah td{background:#f2f9f2}
 .opini-item small{color:#6b7076}
 /* banding */
 .banding-pilih{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
-table.banding{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
-table.banding td,table.banding th{border:1px solid #d4d7db;padding:7px 8px;vertical-align:top;word-wrap:break-word}
-table.banding td.label{width:150px;background:#f4f5f6;font-weight:700;color:#444;text-align:left}
-table.banding td{text-align:center}
-td.menang{background:#e7f3e7;font-weight:700}
-td.beda{background:#fffaeb}
+/* spec-sheet hasil banding: grid div (bukan table) agar kolom label sticky
+   dan scroll horizontal tidak glitch di browser HP. Kolom = 150px + N HP. */
+.cmp{min-width:620px;font-variant-numeric:tabular-nums}
+.cmp-baris{display:grid;grid-template-columns:150px repeat(var(--n,2),minmax(0,1fr))}
+.cmp-baris>div{border:1px solid #d4d7db;padding:7px 8px;min-width:0;overflow-wrap:break-word;background:#fff}
+.cmp-label{background:#f4f5f6;font-weight:700;color:#444;font-size:12px;position:sticky;left:0;z-index:2;box-shadow:1px 0 0 #d4d7db}
+.cmp-val{text-align:center;font-size:12.5px}
+.cmp-val.kiri{text-align:left}
+.cmp-val.menang{background:#e7f3e7;font-weight:700;box-shadow:inset 3px 0 0 #1c6b1c}
+.cmp-val.beda{background:#fffaeb}
+.cmp-baris.tutup{display:none}
+.cmp-kepala>div{background:#3b3f45;color:#fff;font-size:12.5px;border-color:#3b3f45}
+.cmp-kepala .cmp-label{background:#2c3034;color:#fff}
+.cmp-kepala .hapus-link{color:#ffb38a}
+.cmp-kaki>div{background:#f4f5f6;font-size:12px}
+.cmp-sek{background:#e8eaed;border:1px solid #d4d7db;border-bottom:0;margin-top:10px}
+.cmp-sek:first-child{margin-top:0}
 /* berita */
 .berita-baris{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;padding:10px 6px;border-bottom:1px solid #e3e5e8}
 .berita-tgl{border:1px solid #d4d7db;background:#f4f5f6;text-align:center;padding:6px 4px;font-size:11px;color:#555}
@@ -198,14 +209,20 @@ td.beda{background:#fffaeb}
 .foot-copy{border-top:1px solid #454a51;padding:10px;font-size:11px;color:#8f959c;text-align:center}
 /* duel head side-by-side: kartu per HP sejajar di atas tabel, CTA SPEK + BELI */
 .duel-head{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:10px 0}
-.duel-kartu{border:1px solid #d4d7db;background:#f4f5f6;padding:10px;text-align:center;min-width:0}
+.duel-kartu{border:1px solid #d4d7db;background:#f4f5f6;padding:10px;text-align:center;min-width:0;position:relative}
+.duel-kartu.juara{border:2px solid #1c6b1c;background:#f2f9f2}
+.juara-tag{display:block;width:fit-content;margin:0 auto 6px;background:#1c6b1c;color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 8px}
 .duel-kartu .harga-merah{font-size:16px}
 .duel-kartu .aksi{display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap}
 /* picker slot: tombol + panel cari. Panel inline (mendorong konten) agar tak menumpuk. */
-.slot-tampil{width:100%;padding:7px 9px;border:1px solid #a9adb3;background:#fff;font-size:12.5px;font-weight:700;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* picker slot: tampil sebagai tombol pemilih (bukan kolom ketik) — chevron kanan,
+   garis putus-putus saat kosong sebagai isyarat "klik untuk memilih". */
+.slot-tampil{width:100%;padding:7px 28px 7px 9px;border:1px solid #8f959c;background:#fff;font-size:12.5px;font-weight:700;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;color:#222}
+.slot-tampil::after{content:"";position:absolute;right:10px;top:50%;width:7px;height:7px;border-right:2px solid #555;border-bottom:2px solid #555;transform:translateY(-70%) rotate(45deg);pointer-events:none}
 .slot-tampil:hover{border-color:#e8590c}
-.slot-tampil.kosong{color:#6b7076;font-weight:400}
-.slot-panel{border:1px solid #8f959c;border-top:0;background:#fff}
+.slot-tampil.kosong{color:#6b7076;font-weight:400;border-style:dashed;background:#fafbfc}
+.slot-panel{border:1px solid #8f959c;border-top:0;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.14)}
+.slot-item{align-items:center}
 .slot-cari{width:100%;padding:7px 9px;border:0;border-bottom:1px solid #d4d7db;font-size:12.5px;outline:none;box-sizing:border-box}
 .slot-daftar{overflow-y:auto;max-height:250px}
 .slot-item{display:flex;width:100%;gap:8px;align-items:baseline;border:0;border-bottom:1px solid #eee;background:#fff;padding:7px 9px;cursor:pointer;text-align:left;font-size:12.5px;box-sizing:border-box}
@@ -216,18 +233,12 @@ td.beda{background:#fffaeb}
 .iklan{border:1px solid #d4d7db;background:#fafbfc;margin:10px 0;position:relative;padding-top:20px;min-height:64px}
 .iklan-label{position:absolute;top:0;left:0;right:0;background:#e8eaed;color:#6b7076;font-size:9px;font-weight:700;letter-spacing:2px;text-align:center;padding:2px}
 .iklan-kosong{text-align:center;color:#8f959c;font-size:12px;padding:18px 10px}
-/* tabel banding: kolom cukup lebar agar side-by-side terbaca, geser halus di HP */
-table.banding{min-width:600px}
-/* tabel banding: sel teks rata kiri agar rapi, seksi bisa dilipat */
-table.banding td.kiri{text-align:left}
-tr.tutup{display:none}
-.seksi-toggle{border:0;background:none;font:inherit;color:inherit;font-weight:700;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;padding:0;display:block;width:100%;text-align:left}
-.seksi-toggle:hover{text-decoration:underline}
+.seksi-toggle{border:0;background:none;font:inherit;color:inherit;font-weight:700;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;padding:4px 6px;display:block;width:100%;text-align:left}
+.seksi-toggle:hover{background:#dde0e4}
 .kecil-abu{font-size:11px;color:#6b7076}
 /* rekomendasi lawan di picker */
 .reko-judul{font-size:10px;font-weight:700;background:#e8eff7;color:#0d5cb6;padding:5px 9px;letter-spacing:.5px}
 .slot-item.reko{background:#f4f8fd}
-.scroll-x{scroll-snap-type:x proximity}
 .slot-hp label{display:block;font-size:11px;font-weight:700;color:#555;margin-bottom:3px;text-transform:uppercase}
 .slot-baris{display:flex;gap:6px}
 .slot-baris input{flex:1 1 auto;min-width:0;padding:7px;border:1px solid #a9adb3;font-size:12.5px;background:#fff}
@@ -236,9 +247,9 @@ tr.tutup{display:none}
 /* bar angka: untuk apa: AnTuTu 7 digit vs 6 digit tak terbaca sekilas; bar memberi proporsi. */
 .numbar{display:block;background:#e8eaed;height:6px;margin:4px auto 0;max-width:140px}
 .numbar span{display:block;height:6px;background:#0d5cb6}
-td.menang .numbar span{background:#1c6b1c}
-/* pengulang nama di bawah tabel: orientasi kolom saat scroll jauh ke bawah */
-tr.banding-bawah td{background:#f4f5f6;font-size:12px}
+.cmp-val.menang .numbar span{background:#1c6b1c}
+/* pengulang nama di bawah: orientasi kolom saat scroll jauh ke bawah */
+.cmp-kaki>div{background:#f4f5f6;font-size:12px}
 /* ringkasan 1 HP: untuk apa: entry BANDING dari daftar tak boleh jadi jalan buntu */
 .tunggal{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid #d4d7db;background:#f4f5f6;padding:10px;flex-wrap:wrap}
 .vonis{border:1px solid #bcd8bc;background:#f4faf4;padding:10px 12px;margin:10px 0;font-size:12.5px}
@@ -248,8 +259,6 @@ tr.banding-bawah td{background:#f4f5f6;font-size:12px}
 .vonis-item small{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#6b7076}
 .selisih{display:block;font-size:11px;font-weight:400;color:#6b7076}
 .hapus-link{background:none;border:0;color:#b00020;font-size:11px;cursor:pointer;padding:0;text-decoration:underline}
-tr.seksi-banding td{background:#e8eaed;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0d5cb6;text-align:left}
-table.banding td.label{position:sticky;left:0;z-index:2;box-shadow:1px 0 0 #d4d7db}
 /* chip filter aktif: untuk apa: visibilitas state + hapus satuan. Tanpa ini user lupa apa yang memfilter. */
 .chip-wrap{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0 0}
 .chip{display:inline-flex;gap:6px;align-items:center;background:#3b3f45;color:#fff;font-size:11px;font-weight:700;padding:3px 4px 3px 9px}
