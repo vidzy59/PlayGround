@@ -5,10 +5,16 @@ const fs = require("fs");
 const { PHONES, NEWS, AFF, ADS } = require("./data");
 
 const app = express();
+app.disable("x-powered-by");
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json({ limit: "256kb" }));
+// API tidak boleh di-cache agar harga/ulasan selalu segar
+app.use("/api", (req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
 // Header keamanan dasar + cache statis agar tidak tabrakan render dan hemat bandwidth
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
@@ -17,6 +23,24 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h", etag: true }));
+
+// Favicon: 204 agar browser tidak menerima HTML sebagai ikon
+app.get("/favicon.ico", (req, res) => res.status(204).end());
+// Robots dasar untuk publish
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain").send("User-agent: *\nAllow: /\nSitemap: /sitemap.xml\n");
+});
+app.get("/sitemap.xml", (req, res) => {
+  const base = (req.protocol + "://" + req.get("host")).replace(/\/$/, "");
+  const urls = ["/", "/#/phones", "/#/compare", "/#/news", "/#/favorites"]
+    .concat(PHONES.map((p) => "/#/phone/" + p.id))
+    .concat(NEWS.map((n) => "/#/news/" + n.id));
+  res.type("application/xml").send(
+    '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    urls.map((u) => "  <url><loc>" + base + "/" + u.replace(/^\/+/, "") + "</loc></url>").join("\n") +
+    "\n</urlset>"
+  );
+});
 
 // ---- storage ulasan (file JSON sederhana, full-stack persistence) ----
 const REVIEWS_FILE = path.join(__dirname, "reviews.json");
@@ -179,6 +203,14 @@ app.get("/api/phones/:id/similar", (req, res) => {
 });
 
 app.post("/api/phones/:id/reviews", (req, res) => {
+  // Batas spam sederhana: maks 5 opini/menit per IP agar publish aman dari bot
+  const ip = (req.ip || req.connection.remoteAddress || "x").toString();
+  const now = Date.now();
+  if (!global.__rl) global.__rl = {};
+  const arr = (global.__rl[ip] || []).filter((t) => now - t < 60000);
+  if (arr.length >= 5) return res.status(429).json({ error: "Terlalu banyak opini. Coba lagi sebentar." });
+  arr.push(now);
+  global.__rl[ip] = arr;
   const p = PHONES.find((x) => x.id === req.params.id);
   if (!p) return res.status(404).json({ error: "HP tidak ditemukan." });
   const nama = (req.body.nama || "").toString().trim().slice(0, 40);
@@ -262,6 +294,14 @@ app.get("/api/stats", (req, res) => {
 app.get("*", (req, res) => {
   if (req.path.startsWith("/api/")) return res.status(404).json({ error: "Endpoint tidak ditemukan." });
   res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Body JSON rusak harus balas JSON, bukan HTML bawaan Express
+app.use((err, req, res, next) => {
+  if (err && (err.type === "entity.parse.failed" || err.status === 400)) {
+    return res.status(400).json({ error: "Format data tidak valid." });
+  }
+  next(err);
 });
 
 if (require.main === module) {

@@ -170,7 +170,7 @@ tr.termurah td{background:#f2f9f2}
 .opini-item{border-bottom:1px solid #e3e5e8;padding:8px 0;font-size:12.5px}
 .opini-item small{color:#6b7076}
 /* banding */
-.banding-pilih{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.banding-pilih{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin:10px 0}
 /* spec-sheet hasil banding: grid div (bukan table) agar kolom label sticky
    dan scroll horizontal tidak glitch di browser HP. Kolom = 150px + N HP. */
 .cmp{min-width:620px;font-variant-numeric:tabular-nums}
@@ -182,9 +182,14 @@ tr.termurah td{background:#f2f9f2}
 .cmp-val.menang{background:#e7f3e7;font-weight:700;box-shadow:inset 3px 0 0 #1c6b1c}
 .cmp-val.beda{background:#fffaeb}
 .cmp-baris.tutup{display:none}
-.cmp-kepala>div{background:#3b3f45;color:#fff;font-size:12.5px;border-color:#3b3f45}
-.cmp-kepala .cmp-label{background:#2c3034;color:#fff}
-.cmp-kepala .hapus-link{color:#ffb38a}
+/* kepala model sticky: saat menelusuri baris panjang, nama HP tetap terlihat
+   agar mudah dibandingkan. Grid identik dengan tabel; geser horizontal disalin. */
+.cmp-sticky{position:sticky;top:38px;z-index:6;overflow:hidden;background:#3b3f45}
+.cmp-sticky-grid{display:grid;grid-template-columns:150px repeat(var(--n,2),minmax(0,1fr));min-width:620px;color:#fff;font-size:12.5px}
+.cmp-sticky-grid>div{padding:7px 8px;border:1px solid #3b3f45;min-width:0;overflow-wrap:break-word}
+.cmp-head-label{background:#2c3034;font-weight:700;position:relative;z-index:2;box-shadow:1px 0 0 #2c3034}
+.cmp-head-val{text-align:center}
+.cmp-head-val .hapus-link{color:#ffb38a}
 .cmp-kaki>div{background:#f4f5f6;font-size:12px}
 .cmp-sek{background:#e8eaed;border:1px solid #d4d7db;border-bottom:0;margin-top:10px}
 .cmp-sek:first-child{margin-top:0}
@@ -217,7 +222,8 @@ tr.termurah td{background:#f2f9f2}
 /* picker slot: tombol + panel cari. Panel inline (mendorong konten) agar tak menumpuk. */
 /* picker slot: tampil sebagai tombol pemilih (bukan kolom ketik) — chevron kanan,
    garis putus-putus saat kosong sebagai isyarat "klik untuk memilih". */
-.slot-tampil{width:100%;padding:7px 28px 7px 9px;border:1px solid #8f959c;background:#fff;font-size:12.5px;font-weight:700;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;color:#222}
+.slot-tampil{width:100%;padding:5px 28px 5px 7px;border:1px solid #8f959c;background:#fff;font-size:12.5px;font-weight:700;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;color:#222;display:flex;align-items:center;gap:7px}
+.slot-nama{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .slot-tampil::after{content:"";position:absolute;right:10px;top:50%;width:7px;height:7px;border-right:2px solid #555;border-bottom:2px solid #555;transform:translateY(-70%) rotate(45deg);pointer-events:none}
 .slot-tampil:hover{border-color:#e8590c}
 .slot-tampil.kosong{color:#6b7076;font-weight:400;border-style:dashed;background:#fafbfc}
@@ -257,6 +263,15 @@ tr.termurah td{background:#f2f9f2}
 .vonis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .vonis-item{border:1px solid #cfd3d8;background:#fff;padding:6px 9px}
 .vonis-item small{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#6b7076}
+/* bar skor vonis: perbandingan 4 vs 1 terbaca sekilas tanpa membaca kalimat */
+.tally-wrap{margin-top:8px;display:grid;gap:4px}
+.tally-baris{display:grid;grid-template-columns:minmax(90px,170px) 1fr 24px;gap:8px;align-items:center;font-size:12px}
+.tally-nama{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tally-bar{display:block;background:#e8eaed;height:8px}
+.tally-bar>span{display:block;height:8px;background:#0d5cb6}
+.tally-skor{font-weight:700;text-align:right}
+/* bilah aksi komparator: rapi dalam satu bingkai, bukan tombol lepas */
+.cmp-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;background:#f4f5f6;border:1px solid #d4d7db;padding:6px 8px}
 .selisih{display:block;font-size:11px;font-weight:400;color:#6b7076}
 .hapus-link{background:none;border:0;color:#b00020;font-size:11px;cursor:pointer;padding:0;text-decoration:underline}
 /* chip filter aktif: untuk apa: visibilitas state + hapus satuan. Tanpa ini user lupa apa yang memfilter. */
@@ -290,6 +305,10 @@ tr.termurah td{background:#f2f9f2}
 /* cegah tabrakan global */
 img,svg,table{max-width:100%}
 input,select,textarea{min-width:0}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  #toast{transition:none}
+}
 @media(max-width:1000px){
   .kolom{grid-template-columns:180px minmax(0,1fr)}
   .rail-kanan{display:none}
