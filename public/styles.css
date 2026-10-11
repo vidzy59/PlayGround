@@ -228,10 +228,12 @@ tr.termurah td{background:#f2f9f2}
 .slot-tampil::after{content:"";position:absolute;right:10px;top:50%;width:7px;height:7px;border-right:2px solid #555;border-bottom:2px solid #555;transform:translateY(-70%) rotate(45deg);pointer-events:none}
 .slot-tampil:hover{border-color:#e8590c}
 .slot-tampil.kosong{color:#6b7076;font-weight:400;border-style:dashed;background:#fafbfc}
-.slot-panel{border:1px solid #8f959c;border-top:0;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.14)}
-.slot-item{align-items:center}
+/* panel dropdown: melayang di bawah tombol (bukan mendorong konten) agar pilih
+   produk satu klik tanpa menggeser halaman. Slot-baris jadi jangkar posisi. */
+.slot-baris{position:relative}
+.slot-panel{position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:60;border:1px solid #8f959c;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.14)}
 .slot-cari{width:100%;padding:7px 9px;border:0;border-bottom:1px solid #d4d7db;font-size:12.5px;outline:none;box-sizing:border-box}
-.slot-daftar{overflow-y:auto;max-height:250px}
+.slot-daftar{overflow-y:auto;max-height:264px}
 .slot-item{display:flex;width:100%;gap:8px;align-items:baseline;border:0;border-bottom:1px solid #eee;background:#fff;padding:7px 9px;cursor:pointer;text-align:left;font-size:12.5px;box-sizing:border-box}
 .slot-item:hover,.slot-item.aktif{background:#e8eff7}
 .slot-item.sudah{opacity:.45;cursor:default}
@@ -243,9 +245,6 @@ tr.termurah td{background:#f2f9f2}
 .seksi-toggle{border:0;background:none;font:inherit;color:inherit;font-weight:700;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;padding:4px 6px;display:block;width:100%;text-align:left}
 .seksi-toggle:hover{background:#dde0e4}
 .kecil-abu{font-size:11px;color:#6b7076}
-/* rekomendasi lawan di picker */
-.reko-judul{font-size:10px;font-weight:700;background:#e8eff7;color:#0d5cb6;padding:5px 9px;letter-spacing:.5px}
-.slot-item.reko{background:#f4f8fd}
 .slot-hp label{display:block;font-size:11px;font-weight:700;color:#555;margin-bottom:3px;text-transform:uppercase}
 .slot-baris{display:flex;gap:6px}
 .slot-baris input{flex:1 1 auto;min-width:0;padding:7px;border:1px solid #a9adb3;font-size:12.5px;background:#fff}
@@ -318,6 +317,15 @@ input,select,textarea{min-width:0}
   .galeri{border-right:0;border-bottom:1px solid #d4d7db}
   .prokontra{grid-template-columns:minmax(0,1fr)}
   .banding-pilih{grid-template-columns:minmax(0,1fr)}
+  /* compare stacked di layar kecil: nama spek di tengah selebar baris, nilai
+     sejajar di bawahnya. Tanpa geser horizontal: semua kolom selalu muat,
+     label kiri sticky tak diperlukan lagi. */
+  #cmpScroll{overflow:visible}
+  .cmp{min-width:0}
+  .cmp-baris{grid-template-columns:repeat(var(--n,2),minmax(0,1fr))}
+  .cmp-baris .cmp-label{grid-column:1/-1;position:static;box-shadow:none;text-align:center;border-bottom:0}
+  .cmp-sticky-grid{min-width:0;grid-template-columns:repeat(var(--n,2),minmax(0,1fr))}
+  .cmp-head-label{display:none}
   .baris-hp{grid-template-columns:54px minmax(0,1fr)}
   .baris-kanan{grid-column:2;text-align:left}
   .nav-kanan{display:none}

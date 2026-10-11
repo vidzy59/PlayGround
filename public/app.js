@@ -936,17 +936,8 @@
       var reqSeq = 0;
       /* Seksi yang dilipat user: disimpan per halaman agar tidak terbuka lagi tiap muat. */
       var sekTutup = {};
-      /* Slot ke-3: hanya layak tampil setelah slot 1 dan 2 terisi,
-         atau bila URL sudah membawa 3 pilihan. */
-      var slot3Visible = !!ids[2];
-      function duaTerisi() { return !!(ids[0] && ids[1]); }
-      function slot3Tampil() { return slot3Visible || !!ids[2]; }
-      function slot3Layak() { return duaTerisi() && !slot3Tampil(); }
-      function perbaruiSlot3() {
-        var w = document.getElementById("slotWrap2"), b = document.getElementById("wrapSlot3Btn");
-        if (w) w.hidden = !slot3Tampil();
-        if (b) b.hidden = !slot3Layak();
-      }
+      /* Tiga slot selalu tampil (ala kolom GSMArena): tanpa tombol tambah,
+         tanpa syarat urutan. Slot kosong = "Pilih HP...". */
       function daftarAktif() { return ids.filter(Boolean); }
       function syncURL() {
         /* replaceState: URL tetap bisa dibagikan, tapi tanpa hashchange berarti
@@ -976,25 +967,18 @@
         return phoneArt(p, 20, 26, 0) + '<span class="slot-nama">' + esc(p.name) + "</span>";
       }
       app.innerHTML = '<div class="crumbs"><a href="#/">Beranda</a> / <b>Bandingkan HP</b></div>' +
-        '<div style="padding:10px 12px"><div class="judul-blok">Komparator spesifikasi</div>' +
-        '<p class="hasil-info">Pilih HP yang ingin dibandingkan. Hasil tampil langsung dan tautan halaman ini bisa dibagikan.<br>Nilai yang berbeda dicetak tebal; garis hijau menandai pemenang tunggal di kategorinya.</p>' +
+        '<div style="padding:10px 12px"><div class="judul-blok">Bandingkan HP</div>' +
+        '<p class="hasil-info">Pilih sampai tiga HP. Yang berbeda dicetak tebal; garis hijau = pemenang tunggal kategorinya.</p>' +
         '<div class="banding-pilih">' + [0, 1, 2].map(function (i) {
-          var labelSlot = "HP " + (i + 1);
-          var slot = '<div class="slot-hp"><label id="slotLabel' + i + '">' + labelSlot + '</label>' +
+          return '<div class="slot-hp"><label id="slotLabel' + i + '">HP ' + (i + 1) + "</label>" +
             '<div class="slot-baris"><button class="slot-tampil' + (byId[ids[i]] ? "" : " kosong") + '" data-pilih="' + i + '" type="button" aria-haspopup="listbox" aria-expanded="false" id="slotBtn' + i + '">' + slotBtnHTML(ids[i]) + "</button>" +
-            '<button class="tombol tombol-mini" data-bersih="' + i + '" type="button" title="Kosongkan slot ' + (i + 1) + '" aria-label="Kosongkan slot ' + (i + 1) + '">X</button></div>' +
-            '<div class="slot-panel" id="slotPanel' + i + '" hidden><input class="slot-cari" id="slotCari' + i + '" placeholder="Ketik nama HP, merek, atau chipset…" autocomplete="off" aria-label="Cari HP untuk slot ' + (i + 1) + '"><div id="slotReko' + i + '"></div><div class="slot-daftar" id="slotDaftar' + i + '" role="listbox"></div></div>' +
+            '<button class="tombol tombol-mini" data-bersih="' + i + '" type="button" title="Kosongkan slot ' + (i + 1) + '" aria-label="Kosongkan slot ' + (i + 1) + '">X</button>' +
+            '<div class="slot-panel" id="slotPanel' + i + '" hidden><input class="slot-cari" id="slotCari' + i + '" placeholder="Ketik nama HP, merek, atau chipset…" autocomplete="off" aria-label="Cari HP untuk slot ' + (i + 1) + '"><div class="slot-daftar" id="slotDaftar' + i + '" role="listbox"></div></div></div>' +
             '<div class="hasil-info slot-info" id="slotInfo' + i + '">' + esc(infoSlot(ids[i])) + "</div></div>";
-          /* Slot ke-3: disembunyikan sampai user memintanya atau sudah terisi. */
-          if (i === 2) slot = '<div id="slotWrap2"' + ((slot3Visible || ids[2]) ? "" : " hidden") + ">" + slot + "</div>";
-          return slot;
         }).join("") + "</div>" +
-        '<div style="margin:0 0 4px"' + (slot3Layak() ? "" : ' hidden') + ' id="wrapSlot3Btn"><button class="tombol" id="btnSlot3" type="button">+ TAMBAH HP KE-3</button></div>' +
-        '<div id="cepatBox"></div>' +
-        '<div class="cmp-actions"><label class="hasil-info"><input type="checkbox" id="cekBeda"' + (sorot ? " checked" : "") + "> Tandai baris yang berbeda</label>" +
+        '<div class="cmp-actions"><label class="hasil-info"><input type="checkbox" id="cekBeda"' + (sorot ? " checked" : "") + "> Sorot yang berbeda</label>" +
         '<button class="tombol tombol-mini" id="btnSalinBanding" type="button">SALIN TAUTAN</button>' +
-        '<button class="tombol tombol-mini" id="btnResetBanding" type="button">ATUR ULANG</button>' +
-        '<span class="hasil-info">Tautan halaman ini bisa dibagikan ke siapa pun.</span></div>' +
+        '<button class="tombol tombol-mini" id="btnResetBanding" type="button">ATUR ULANG</button></div>' +
         iklanHTML("banding_atas") +
         '<div id="hasilBanding" style="margin-top:10px"></div></div>';
       /* Picker custom (bukan datalist): berfungsi penuh di browser HP, ada harga
@@ -1041,51 +1025,7 @@
         p.hidden = false;
         if (btn) btn.setAttribute("aria-expanded", "true");
         gambarDaftar(i);
-        gambarReko(i);
         if (c) { c.value = ""; setTimeout(function () { c.focus(); }, 0); }
-      }
-      /* Rekomendasi lawan: sepadan dengan HP yang sudah dipilih di slot lain
-         (skor kemiripan server + selisih harga). Di-cache per HP. */
-      var rekoCache = {};
-      function gambarReko(i) {
-        var box = document.getElementById("slotReko" + i);
-        if (!box) return;
-        var lawan = null;
-        for (var k = 0; k < 3; k++) if (k !== i && ids[k]) { lawan = ids[k]; break; }
-        if (!lawan || !byId[lawan]) { box.innerHTML = ""; return; }
-        var p = byId[lawan];
-        function tampil(list) {
-          if (panelBuka !== i) return;
-          var box2 = document.getElementById("slotReko" + i);
-          if (!box2) return;
-          var isi = (list || []).filter(function (x) { return ids.indexOf(x.id) === -1; }).slice(0, 3);
-          if (!isi.length) { box2.innerHTML = ""; return; }
-          box2.innerHTML = '<div class="reko-judul">REKOMENDASI LAWAN UNTUK ' + esc(namaPendek(p).toUpperCase()) + "</div>" +
-            isi.map(function (x) {
-              var sel = Math.abs(x.hargaTermurah - hargaMin(p));
-              return '<button class="slot-item reko" data-item="' + esc(x.id) + '" data-slotidx="' + i + '" type="button">' + phoneArt(x, 30, 40, 0) +
-                '<span style="min-width:0"><b>' + esc(x.name) + "</b><br><small>Selisih " + formatIDR(sel) + " · AnTuTu " + Number(x.antutu).toLocaleString("id-ID") + "</small></span>" +
-                '<span class="ac-harga">' + formatIDR(x.hargaTermurah) + "</span></button>";
-            }).join("");
-          box2.querySelectorAll("[data-item]").forEach(function (b) {
-            b.onclick = function (ev) {
-              ev.stopPropagation();
-              tutupPanel();
-              pilihSlot(i, b.getAttribute("data-item"));
-            };
-          });
-        }
-        if (rekoCache[lawan]) { tampil(rekoCache[lawan]); return; }
-        box.innerHTML = '<div class="hasil-info" style="padding:6px 9px">Memuat rekomendasi…</div>';
-        api("/api/phones/" + encodeURIComponent(lawan) + "/similar").then(function (sim) {
-          rekoCache[lawan] = sim;
-          tampil(sim);
-        }).catch(function () {
-          if (panelBuka === i) {
-            var b2 = document.getElementById("slotReko" + i);
-            if (b2) b2.innerHTML = "";
-          }
-        });
       }
       function tutupPanel() {
         if (panelBuka < 0) return;
@@ -1103,7 +1043,6 @@
           }
           if (info) info.textContent = infoSlot(ids[i]);
         });
-        gambarCepat();
       }
       function pilihSlot(i, id) {
         /* Duplikat = membandingkan HP dengan dirinya sendiri: ditolak dengan alasan. */
@@ -1113,8 +1052,6 @@
           return;
         }
         ids[i] = id || null;
-        if (!duaTerisi()) slot3Visible = false;
-        perbaruiSlot3();
         syncURL(); gambarSlot(); muat();
       }
       app.querySelectorAll("[data-pilih]").forEach(function (b) {
@@ -1150,45 +1087,12 @@
         b.onclick = function () {
           var i = parseInt(b.getAttribute("data-bersih"), 10);
           ids[i] = null;
-          if (!duaTerisi()) slot3Visible = false;
-          perbaruiSlot3();
           syncURL(); gambarSlot(); muat();
         };
       });
-      var btnSlot3 = document.getElementById("btnSlot3");
-      if (btnSlot3) btnSlot3.onclick = function () {
-        slot3Visible = true;
-        perbaruiSlot3();
-        bukaPanel(2);
-      };
-      function gambarCepat() {
-        var box = document.getElementById("cepatBox");
-        if (!box) return;
-        var favs = favList().map(function (id) { return byId[id]; }).filter(function (p) { return p && ids.indexOf(p.id) === -1; });
-        if (!favs.length) { box.innerHTML = ""; return; }
-        box.innerHTML = '<div class="hasil-info" style="margin:8px 0 4px">Dari favorit — klik untuk mengisi slot kosong:</div><div style="display:flex;gap:6px;flex-wrap:wrap">' + favs.map(function (p) { return '<button class="tombol tombol-mini" data-cepat="' + esc(p.id) + '" type="button">+ ' + esc(namaPendek(p)) + "</button>"; }).join("") + "</div>";
-        box.querySelectorAll("[data-cepat]").forEach(function (b) {
-          b.onclick = function () {
-            /* Isi slot 1-2 dulu; slot 3 hanya bila keduanya sudah terisi. */
-            var kosong = -1;
-            if (!ids[0]) kosong = 0;
-            else if (!ids[1]) kosong = 1;
-            else if (slot3Tampil() && !ids[2]) kosong = 2;
-            if (kosong < 0 && slot3Layak()) {
-              slot3Visible = true;
-              perbaruiSlot3();
-              kosong = 2;
-            }
-            if (kosong < 0) { toast("Slot penuh — kosongkan satu slot dulu"); return; }
-            pilihSlot(kosong, b.getAttribute("data-cepat"));
-          };
-        });
-      }
       document.getElementById("btnResetBanding").onclick = function () {
         /* Di tempat: tanpa reload agar posisi scroll dan fokus tidak hilang. */
         ids = [null, null, null];
-        slot3Visible = false;
-        perbaruiSlot3();
         syncURL(); gambarSlot(); muat();
         toast("Pilihan dikosongkan");
       };
@@ -1207,35 +1111,12 @@
           '<a class="tombol" href="#/compare?ids=samsung-galaxy-s24-ultra,iphone-15-pro-max">S24 Ultra vs iPhone 15 Pro Max</a> ' +
           '<a class="tombol" href="#/compare?ids=infinix-note-40-pro,samsung-galaxy-a54">Note 40 Pro vs Galaxy A54</a>';
       }
-      /* Satu HP bukan jalan buntu: tampilkan ringkasannya + carikan lawan sepadan. */
+      /* Satu HP: butuh satu lawan. Pilih di slot yang masih kosong atau duel populer. */
       function renderTunggal(box, id) {
         var p = byId[id];
         if (!p) { box.innerHTML = '<div class="error-box">HP tidak dikenal.</div>'; return; }
-        box.innerHTML = '<div class="tunggal"><div style="min-width:0"><b>' + esc(p.name) + "</b><br><span class=\"hasil-info\">" + formatIDR(hargaMin(p)) + " · AnTuTu " + Number(p.antutu).toLocaleString("id-ID") + " · " + esc(p.memory.ramUtama) + "GB RAM</span></div>" +
-          '<div><button class="tombol tombol-primer tombol-mini" id="btnLawan" type="button">CARI LAWAN SEPADAN</button></div></div>' +
-          '<div class="kosong" style="border:0;padding:14px 6px 6px"><b>Pilih satu HP lagi.</b> Ketik di slot atas, ambil dari favorit, atau buka duel populer:<br><br>' + duelButtons() + "</div>";
-        document.getElementById("btnLawan").onclick = function () {
-          var btn = this;
-          btn.disabled = true;
-          btn.textContent = "MENCARI...";
-          api("/api/phones/" + encodeURIComponent(id) + "/similar").then(function (sim) {
-            var lawan = null;
-            for (var i = 0; i < sim.length; i++) if (ids.indexOf(sim[i].id) === -1) { lawan = sim[i].id; break; }
-            if (!lawan) { toast("Tidak ada lawan sepadan yang belum dipilih"); btn.disabled = false; btn.textContent = "CARI LAWAN SEPADAN"; return; }
-            var kosong = -1;
-            if (!ids[0]) kosong = 0;
-            else if (!ids[1]) kosong = 1;
-            else if (slot3Tampil() && !ids[2]) kosong = 2;
-            if (kosong < 0 && slot3Layak()) {
-              slot3Visible = true;
-              perbaruiSlot3();
-              kosong = 2;
-            }
-            if (kosong < 0) kosong = 1;
-            pilihSlot(kosong, lawan);
-            toast("Lawan ditemukan: " + (byId[lawan] ? byId[lawan].name : lawan));
-          }).catch(function () { toast("Gagal memuat rekomendasi, coba lagi"); btn.disabled = false; btn.textContent = "CARI LAWAN SEPADAN"; });
-        };
+        box.innerHTML = '<div class="tunggal"><div style="min-width:0"><b>' + esc(p.name) + "</b><br><span class=\"hasil-info\">" + formatIDR(hargaMin(p)) + " · AnTuTu " + Number(p.antutu).toLocaleString("id-ID") + " · " + esc(p.memory.ramUtama) + "GB RAM</span></div></div>" +
+          '<div class="kosong" style="border:0;padding:14px 6px 6px"><b>Pilih satu HP lagi</b> di slot yang masih kosong, atau buka duel populer:<br><br>' + duelButtons() + "</div>";
       }
       function muat() {
         var list = daftarAktif();
@@ -1406,7 +1287,7 @@
                Kimovil Prices): semua keputusan beli terpusat, tombol BELI penuh. */
             seksi("Harga dan pembelian", "beli", 2) +
             brs("Toko termurah", function (r) { return esc(tokoMin(r)); }, -1, "kiri", "beli") +
-            brs("Beli", function (r) { return tombolBeli(tokoMin(r), r.name, false); }, -1, "", "beli") +
+            brs("Beli", function (r) { return tombolBeli(tokoMin(r), r.name, true); }, -1, "", "beli") +
             '<div class="cmp-baris cmp-kaki"><div class="cmp-label">Model</div>' + rows.map(function (r) {
               return '<div class="cmp-val"><a href="#/phone/' + esc(r.id) + '"><b>' + esc(namaPendek(r)) + "</b></a><br><span class=\"harga-merah\">" + formatIDR(r.hargaTermurah) + "</span></div>";
             }).join("") + "</div>" +
@@ -1440,8 +1321,6 @@
               var buang = btn.getAttribute("data-hapus");
               /* In-place: tanpa location.hash agar tidak render ulang + lompat scroll. */
               ids = ids.map(function (x) { return x === buang ? null : x; });
-              if (!ids[0] || !ids[1]) slot3Visible = false;
-              perbaruiSlot3();
               syncURL(); gambarSlot(); muat();
             };
           });
