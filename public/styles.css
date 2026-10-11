@@ -179,8 +179,10 @@ tr.termurah td{background:#f2f9f2}
 .cmp-label{background:#f4f5f6;font-weight:700;color:#444;font-size:12px;position:sticky;left:0;z-index:2;box-shadow:1px 0 0 #d4d7db}
 .cmp-val{text-align:center;font-size:12.5px}
 .cmp-val.kiri{text-align:left}
-.cmp-val.menang{background:#e7f3e7;font-weight:700;box-shadow:inset 3px 0 0 #1c6b1c}
-.cmp-val.beda{background:#fffaeb}
+/* pemenang: garis hijau + tebal saja (pola Kimovil/GSMArena: tanpa blok warna).
+   beda (sorot): tebal saja, tanpa kuning. */
+.cmp-val.menang{font-weight:700;box-shadow:inset 3px 0 0 #1c6b1c}
+.cmp-val.beda{font-weight:700}
 .cmp-baris.tutup{display:none}
 /* kepala model sticky: saat menelusuri baris panjang, nama HP tetap terlihat
    agar mudah dibandingkan. Grid identik dengan tabel; geser horizontal disalin. */
@@ -190,6 +192,7 @@ tr.termurah td{background:#f2f9f2}
 .cmp-head-label{background:#2c3034;font-weight:700;position:relative;z-index:2;box-shadow:1px 0 0 #2c3034}
 .cmp-head-val{text-align:center}
 .cmp-head-val .hapus-link{color:#ffb38a}
+.cmp-head-val small{color:#cfd4d9;font-weight:400}
 .cmp-kaki>div{background:#f4f5f6;font-size:12px}
 .cmp-sek{background:#e8eaed;border:1px solid #d4d7db;border-bottom:0;margin-top:10px}
 .cmp-sek:first-child{margin-top:0}
@@ -215,8 +218,6 @@ tr.termurah td{background:#f2f9f2}
 /* duel head side-by-side: kartu per HP sejajar di atas tabel, CTA SPEK + BELI */
 .duel-head{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:10px 0}
 .duel-kartu{border:1px solid #d4d7db;background:#f4f5f6;padding:10px;text-align:center;min-width:0;position:relative}
-.duel-kartu.juara{border:2px solid #1c6b1c;background:#f2f9f2}
-.juara-tag{display:block;width:fit-content;margin:0 auto 6px;background:#1c6b1c;color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 8px}
 .duel-kartu .harga-merah{font-size:16px}
 .duel-kartu .aksi{display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap}
 /* picker slot: tombol + panel cari. Panel inline (mendorong konten) agar tak menumpuk. */
@@ -258,18 +259,8 @@ tr.termurah td{background:#f2f9f2}
 .cmp-kaki>div{background:#f4f5f6;font-size:12px}
 /* ringkasan 1 HP: untuk apa: entry BANDING dari daftar tak boleh jadi jalan buntu */
 .tunggal{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid #d4d7db;background:#f4f5f6;padding:10px;flex-wrap:wrap}
-.vonis{border:1px solid #bcd8bc;background:#f4faf4;padding:10px 12px;margin:10px 0;font-size:12.5px}
-.vonis h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;color:#1c6b1c}
-.vonis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
-.vonis-item{border:1px solid #cfd3d8;background:#fff;padding:6px 9px}
-.vonis-item small{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#6b7076}
-/* bar skor vonis: perbandingan 4 vs 1 terbaca sekilas tanpa membaca kalimat */
-.tally-wrap{margin-top:8px;display:grid;gap:4px}
-.tally-baris{display:grid;grid-template-columns:minmax(90px,170px) 1fr 24px;gap:8px;align-items:center;font-size:12px}
-.tally-nama{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tally-bar{display:block;background:#e8eaed;height:8px}
-.tally-bar>span{display:block;height:8px;background:#0d5cb6}
-.tally-skor{font-weight:700;text-align:right}
+/* kalimat vonis ramping: satu baris kesimpulan, angka ada di Ringkasan skor */
+.vonis-kalimat{border:1px solid #bcd8bc;background:#f4faf4;padding:7px 10px;margin:10px 0 0;font-size:12.5px}
 /* bilah aksi komparator: rapi dalam satu bingkai, bukan tombol lepas */
 .cmp-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;background:#f4f5f6;border:1px solid #d4d7db;padding:6px 8px}
 .selisih{display:block;font-size:11px;font-weight:400;color:#6b7076}

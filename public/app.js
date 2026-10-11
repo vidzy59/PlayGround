@@ -977,7 +977,7 @@
       }
       app.innerHTML = '<div class="crumbs"><a href="#/">Beranda</a> / <b>Bandingkan HP</b></div>' +
         '<div style="padding:10px 12px"><div class="judul-blok">Komparator spesifikasi</div>' +
-        '<p class="hasil-info">Pilih HP yang ingin dibandingkan. Hasil tampil langsung dan tautan halaman ini bisa dibagikan.<br>Sel hijau berarti unggul tunggal di kategorinya. Baris kuning menandai nilai yang berbeda.</p>' +
+        '<p class="hasil-info">Pilih HP yang ingin dibandingkan. Hasil tampil langsung dan tautan halaman ini bisa dibagikan.<br>Nilai yang berbeda dicetak tebal; garis hijau menandai pemenang tunggal di kategorinya.</p>' +
         '<div class="banding-pilih">' + [0, 1, 2].map(function (i) {
           var labelSlot = "HP " + (i + 1);
           var slot = '<div class="slot-hp"><label id="slotLabel' + i + '">' + labelSlot + '</label>' +
@@ -1273,7 +1273,6 @@
           var antuMax = Math.max.apply(null, antuVals), batMax = Math.max.apply(null, batVals), wattMax = Math.max.apply(null, wattVals);
           var tally = rows.map(function () { return 0; });
           [wHarga, wRate, wBat, wAntu, wRam, wStor, wRef, wWatt].forEach(function (w) { if (w >= 0) tally[w]++; });
-          function nama(i) { return i >= 0 ? rows[i].name : "Berimbang"; }
           /* Tally bernama: "(3-2)" kriptik diganti "(POCO 3 - Redmi 2)" agar langsung paham. */
           function tallyTeks() {
             return rows.map(function (r, i) { return namaPendek(r) + " " + tally[i]; }).join(" - ");
@@ -1296,21 +1295,9 @@
           var vonisUmum = juara.length === 1
             ? "<b>" + esc(juara[0]) + "</b> unggul pada " + skorMax + " dari 8 kategori angka (" + esc(tallyTeks()) + ")."
             : "Hasil berimbang (" + esc(tallyTeks()) + ") — pilih berdasarkan prioritas: harga, kamera, atau gaming.";
-          var vonis = '<div class="vonis"><h4>Kesimpulan berdasarkan angka</h4><div class="vonis-grid">' +
-            '<div class="vonis-item"><small>Harga terendah</small><b>' + esc(nama(wHarga)) + "</b><br>" + (wHarga >= 0 ? formatIDR(hargaVals[wHarga]) : "Harga sama") + "</div>" +
-            '<div class="vonis-item"><small>Performa tertinggi</small><b>' + esc(nama(wAntu)) + "</b><br>" + (wAntu >= 0 ? "AnTuTu " + Number(antuVals[wAntu]).toLocaleString("id-ID") : "Skor sama") + "</div>" +
-            '<div class="vonis-item"><small>Baterai terbesar</small><b>' + esc(nama(wBat)) + "</b><br>" + (wBat >= 0 ? esc(batVals[wBat]) + " mAh" : "Sama besar") + "</div>" +
-            '<div class="vonis-item"><small>Rating tertinggi</small><b>' + esc(nama(wRate)) + "</b><br>" + (wRate >= 0 ? esc(rateVals[wRate]) + "/5" : "Rating sama") + "</div>" +
-            '</div><div style="margin-top:8px">' + vonisUmum + "</div>" + tallyBars() + "</div>";
-          /* Bar skor per HP: pemenang tunggal berbar hijau agar terbaca sekilas. */
-          function tallyBars() {
-            var topUni = juara.length === 1;
-            return '<div class="tally-wrap">' + rows.map(function (r, i) {
-              var pct = Math.max(4, Math.round(tally[i] / 8 * 100));
-              var hujau = topUni && tally[i] === skorMax ? ";background:#1c6b1c" : "";
-              return '<div class="tally-baris"><span class="tally-nama">' + esc(namaPendek(r)) + '</span><span class="tally-bar"><span style="width:' + pct + "%" + hujau + '"></span></span><span class="tally-skor">' + tally[i] + "</span></div>";
-            }).join("") + "</div>";
-          }
+          /* Kalimat vonis ramping di bawah kartu (seperti ringkasan skor Kimovil di
+             atas spek): angka lengkapnya ada di seksi "Ringkasan skor" pertama tabel. */
+          var vonisBar = '<div class="vonis-kalimat">' + vonisUmum + "</div>";
           var minH = Math.min.apply(null, hargaVals);
           function beda(fn) {
             if (!sorot) return "";
@@ -1340,20 +1327,17 @@
           function selisih(h) {
             return h === minH ? "" : '<span class="selisih">+' + formatIDR(h - minH) + " dari termurah</span>";
           }
-          /* Kartu duel side-by-side di atas tabel: foto besar sejajar, harga,
-             rating, dan CTA SPEK + BELI. Tabel di bawah untuk bedah baris. */
+          /* Kepala identitas ala GSMArena/Kimovil: foto kecil sejajar, nama lengkap +
+             varian RAM/storage (identitas tipe), harga, satu CTA SPEK. Tanpa rating
+             dan tanpa tombol BELI ganda: rating ada di tabel, BELI ada di seksi
+             "Harga dan pembelian" di akhir agar keputusan beli terpusat di sana. */
           function duelHead() {
-            var skorTop = Math.max.apply(null, tally);
-            var tunggal = tally.filter(function (t) { return t === skorTop; }).length === 1;
-            return '<div class="duel-head">' + rows.map(function (r, ri) {
-              var juara = tunggal && tally[ri] === skorTop && skorTop > 0 && rows.length > 1;
-              return '<div class="duel-kartu' + (juara ? " juara" : "") + '">' +
-                (juara ? '<span class="juara-tag">UNGGUL ANGKA</span>' : "") +
-                '<a href="#/phone/' + esc(r.id) + '">' + phoneArt(r, 72, 96, 0) + "<br><b>" + esc(r.name) + "</b></a>" +
+            return '<div class="duel-head">' + rows.map(function (r) {
+              return '<div class="duel-kartu">' +
+                '<a href="#/phone/' + esc(r.id) + '">' + phoneArt(r, 52, 68, 0) + "<br><b>" + esc(r.name) + "</b></a>" +
+                '<div class="skor-kecil">' + esc(r.memory.ramUtama) + "GB · " + esc(r.memory.storageUtama) + "GB</div>" +
                 '<div class="harga-merah">' + formatIDR(r.hargaTermurah) + "</div>" +
-                '<div class="skor-kecil"><span class="rate-num' + kelasRate(r.ratingLive) + '">' + esc(r.ratingLive) + "</span> " + esc(r.reviewCountLive) + " penilaian</div>" +
-                '<div class="skor-kecil">Unggul <b>' + tally[ri] + '</b> dari 8 kategori</div>' +
-                '<div class="aksi"><a class="tombol tombol-mini" href="#/phone/' + esc(r.id) + '">SPEK</a>' + tombolBeli(tokoMin(r), r.name, true) + "</div></div>";
+                '<div class="aksi"><a class="tombol tombol-mini" href="#/phone/' + esc(r.id) + '">SPEK</a></div></div>';
             }).join("") + "</div>";
           }
           /* Kepala model dibuat menempel (sticky) di bawah nav: saat menelusuri
@@ -1363,12 +1347,22 @@
           var kepala = '<div class="cmp-sticky"><div class="cmp-sticky-grid" id="cmpStickyGrid" style="--n:' + rows.length + '">' +
             '<div class="cmp-head-label" id="cmpHeadLabel">Model</div>' +
             rows.map(function (r) {
-              return '<div class="cmp-head-val"><b>' + esc(namaPendek(r)) + '</b> <button class="hapus-link" data-hapus="' + esc(r.id) + '" type="button">Hapus</button></div>';
+              return '<div class="cmp-head-val"><b>' + esc(namaPendek(r)) + '</b> <button class="hapus-link" data-hapus="' + esc(r.id) + '" type="button">Hapus</button><br><small>' + esc(r.memory.ramUtama) + "GB · " + esc(r.memory.storageUtama) + "GB</small></div>";
             }).join("") + "</div></div>";
-          box.innerHTML = vonis + duelHead() + kepala + '<div class="scroll-x" id="cmpScroll"><div class="cmp" style="--n:' + rows.length + '">' +
-            seksi("Harga", "harga", 2) +
+          box.innerHTML = duelHead() + vonisBar + kepala + '<div class="scroll-x" id="cmpScroll"><div class="cmp" style="--n:' + rows.length + '">' +
+            /* Ringkasan skor di seksi pertama (pola Kimovil): baca pemenang tiap
+               kategori tanpa menggulir ke bawah; detailnya di seksi masing-masing. */
+            seksi("Ringkasan skor", "skor", 8) +
+            brs("Harga terendah", function (r) { return formatIDR(r.hargaTermurah); }, wHarga, "", "skor") +
+            brs("Skor AnTuTu", function (r) { return Number(r.antutu).toLocaleString("id-ID"); }, wAntu, "", "skor") +
+            brs("Baterai", function (r) { return esc(r.battery.kapasitas) + " mAh"; }, wBat, "", "skor") +
+            brs("Rating pengguna", function (r) { return r.ratingLive + "/5"; }, wRate, "", "skor") +
+            brs("RAM", function (r) { return esc(r.memory.ramUtama) + " GB"; }, wRam, "", "skor") +
+            brs("Penyimpanan", function (r) { return esc(r.memory.storageUtama) + " GB"; }, wStor, "", "skor") +
+            brs("Refresh rate", function (r) { return esc(r.display.refreshRate) + " Hz"; }, wRef, "", "skor") +
+            brs("Pengisian cepat", function (r) { return esc(r.battery.charging); }, wWatt, "kiri", "skor") +
+            seksi("Harga", "harga", 1) +
             brs("Harga termurah", function (r) { return "<b>" + formatIDR(r.hargaTermurah) + "</b>" + selisih(r.hargaTermurah); }, wHarga) +
-            brs("Toko termurah", function (r) { return esc(tokoMin(r)) + " " + tombolBeli(tokoMin(r), r.name, true); }, -1, "kiri", "harga") +
             seksi("Penilaian pengguna", "nilai", 1) +
             brs("Rating pengguna", function (r) { return r.ratingLive + "/5 (" + r.reviewCountLive + " penilaian)"; }, wRate, "", "nilai") +
             seksi("Layar", "layar", 5) +
@@ -1408,11 +1402,16 @@
             brs("Bluetooth", function (r) { return esc(r.comms.bluetooth); }, -1, "kiri", "konek") +
             brs("Port USB", function (r) { return esc(r.comms.usb); }, -1, "kiri", "konek") +
             brs("Tanggal rilis", function (r) { return esc(r.launch.rilis); }, -1, "", "konek") +
+            /* Harga dan pembelian di seksi akhir (pola GSMArena Misc-Price /
+               Kimovil Prices): semua keputusan beli terpusat, tombol BELI penuh. */
+            seksi("Harga dan pembelian", "beli", 2) +
+            brs("Toko termurah", function (r) { return esc(tokoMin(r)); }, -1, "kiri", "beli") +
+            brs("Beli", function (r) { return tombolBeli(tokoMin(r), r.name, false); }, -1, "", "beli") +
             '<div class="cmp-baris cmp-kaki"><div class="cmp-label">Model</div>' + rows.map(function (r) {
               return '<div class="cmp-val"><a href="#/phone/' + esc(r.id) + '"><b>' + esc(namaPendek(r)) + "</b></a><br><span class=\"harga-merah\">" + formatIDR(r.hargaTermurah) + "</span></div>";
             }).join("") + "</div>" +
             "</div></div>" +
-            '<p class="hasil-info">Sel hijau menandai unggul tunggal di kategorinya. Klik judul seksi untuk melipat atau membuka. Kamera, OS, ketahanan air, dan berat tidak diperingkat karena angka terbesar belum tentu yang terbaik.</p>';
+            '<p class="hasil-info">Nilai yang berbeda dicetak tebal; garis hijau menandai pemenang tunggal di kategorinya. Klik judul seksi untuk melipat atau membuka. Kamera, OS, ketahanan air, dan berat tidak diperingkat karena angka terbesar belum tentu yang terbaik.</p>';
           /* Geser horizontal tabel disalin ke kepala sticky: nama model tetap
              lurus di atas kolomnya. Kolom label dikunci agar tetap di kiri. */
           var scGulir = document.getElementById("cmpScroll");
