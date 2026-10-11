@@ -803,18 +803,8 @@ const PHONES = [
   }
 ];
 
-const NEWS = [
-  { "id": 1, "judul": "Samsung Galaxy S25 Ultra bocor: Snapdragon 8 Elite, kamera 200MP baru", "kategori": "Rumor", "tanggal": "2026-09-28", "ringkasan": "Render CAD mengungkap sudut membulat, bezel 0.8mm, dan RAM 16GB untuk pertama kalinya di seri Ultra.", "isi": "Berdasarkan dokumen sertifikasi dan render OnLeaks, Galaxy S25 Ultra akan memakai Snapdragon 8 Elite for Galaxy, layar 6.9 inci QHD+ 3000 nits, dan kamera ultrawide 50MP baru. Baterai tetap 5000 mAh dengan charging 45W. Peluncuran diprediksi Januari 2026 dengan harga mulai Rp 22,9 juta.", "terkait": ["samsung-galaxy-s24-ultra", "oneplus-12"] },
-  { "id": 2, "judul": "POCO X6 Pro vs Redmi Note 13 Pro: mana yang layak dibeli 2026?", "kategori": "Komparasi", "tanggal": "2026-09-20", "ringkasan": "Selisih Rp 500 ribu, beda kelas performa. Kami uji gaming, kamera, dan baterai keduanya.", "isi": "POCO X6 Pro unggul jauh di performa (Dimensity 8300 Ultra, AnTuTu 1,4 juta vs 608 ribu) dan cocok untuk gaming. Redmi Note 13 Pro 5G menang di kamera 200MP dengan OIS lebih stabil dan layar dengan bezel lebih tipis. Jika prioritas gaming pilih POCO, jika kamera dan desain pilih Redmi.", "terkait": ["poco-x6-pro", "xiaomi-redmi-note-13-pro"] },
-  { "id": 3, "judul": "Infinix Note 40 Pro 5G resmi: HP 3 jutaan pertama dengan wireless charging", "kategori": "Peluncuran", "tanggal": "2026-09-12", "ringkasan": "70W kabel + 20W wireless MagCharge, layar AMOLED curved 120Hz, speaker JBL.", "isi": "Infinix Note 40 Pro 5G resmi masuk Indonesia Rp 3.499.000 (8/256GB). Keunggulannya adalah wireless charging 20W magnetik pertama di harga 3 jutaan, layar curved 6.78 inci AMOLED, dan kamera 108MP OIS. Paket penjualan termasuk MagPad dan MagCase.", "terkait": ["infinix-note-40-pro", "infinix-hot-40-pro"] },
-  { "id": 4, "judul": "Tips: cara cek HP second agar tidak tertipu refurbish", "kategori": "Tips", "tanggal": "2026-09-05", "ringkasan": "Cek IMEI, sensor, baterai health, dan segel baut sebelum bayar.", "isi": "1) Cek IMEI di kemenperin.go.id. 2) Tes semua sensor via kode *#0*# (Samsung) atau aplikasi Phone Doctor. 3) Cek battery health di atas 85 persen. 4) Periksa segel baut dan bekas lem LCD. 5) Lakukan reset pabrik di tempat dan login ulang akun.", "terkait": ["samsung-galaxy-a15-5g", "xiaomi-redmi-13c", "iphone-13"] },
-  { "id": 5, "judul": "HP 2 jutaan terbaik 2026: NFC wajib, refresh rate minimal 90Hz", "kategori": "Panduan", "tanggal": "2026-08-28", "ringkasan": "Dari 7 tipe 1-3 jutaan di database, hanya 5 yang punya NFC dan layar Full HD.", "isi": "Untuk budget 2 jutaan, prioritaskan NFC (e-money dan e-KTP), layar minimal FHD 90Hz, dan charging 33W. Infinix Hot 40 Pro menang performa (Helio G99 + 120Hz), Realme C67 menang kamera (108MP 3x zoom), Oppo A78 menang layar (AMOLED + fingerprint di layar). Hindari yang masih eMMC dan tanpa gyro hardware jika suka gaming.", "terkait": ["infinix-hot-40-pro", "realme-c67", "oppo-a78"] },
-  { "id": 6, "judul": "POCO F6 vs Xiaomi 13T: beda Rp 1,2 juta, pilih gaming atau kamera Leica?", "kategori": "Komparasi", "tanggal": "2026-08-18", "ringkasan": "Snapdragon 8s Gen 3 vs Dimensity 8200 Ultra, IMX920 vs Leica IMX707.", "isi": "POCO F6 (Rp 5,2 juta) unggul AnTuTu 1,52 juta vs 898 ribu, lebih ringan, charging 90W. Xiaomi 13T (Rp 6,4 juta) unggul kamera Leica + tele 2x, IP68, layar 144Hz 2600 nits. Gamer murni pilih F6. Fotografer pilih 13T. Keduanya dapat update panjang dan NFC.", "terkait": ["poco-f6", "xiaomi-13t"] },
-  { "id": 7, "judul": "iPhone 13 di 2026: masih layak dibeli di bawah Rp 9 juta?", "kategori": "Analisis", "tanggal": "2026-08-08", "ringkasan": "A15 masih kencang, tapi layar 60Hz dan Lightning jadi catatan.", "isi": "iPhone 13 bekas resmi kini Rp 8,9 juta. Kelebihan: compact, Face ID, update sampai iOS 18, video sinematik. Kekurangan: 60Hz vs Android 90-120Hz di harga sama, Lightning, baterai 3240 mAh. Layak jika butuh iOS murah dan compact. Jika prioritas layar dan baterai, Galaxy S23 FE atau Xiaomi 13T lebih masuk akal.", "terkait": ["iphone-13", "samsung-galaxy-s23-fe", "xiaomi-13t"] },
-  { "id": 8, "judul": "Arti IP rating: IP54 vs IP67 vs IP68 untuk pemakaian harian", "kategori": "Tips", "tanggal": "2026-07-30", "ringkasan": "IP54 hanya cipratan, IP67 rendaman dangkal, IP68 rendaman dalam.", "isi": "IP54 (Redmi Note 13 Pro, Reno 11 Pro): tahan cipratan hujan, bukan rendaman. IP67 (Galaxy A54, Pixel 7a): rendaman 1m 30 menit. IP68 (S24 Ultra, iPhone, Xiaomi 13T): rendaman lebih dalam dan debu penuh. Jangan sengaja rendam HP walau IP68 karena garansi tidak mencakup cairan. Untuk ojek dan hujan Jakarta, minimal IP54, ideal IP67 ke atas.", "terkait": ["samsung-galaxy-a54", "google-pixel-7a", "xiaomi-13t"] }
-];
 
-module.exports = { PHONES, NEWS };
+module.exports = { PHONES };
 
 /* ============ PENGHASILAN: AFILIASI MARKETPLACE ============
    Untuk apa: tombol BELI di tabel harga mengarah ke pencarian HP di marketplace
@@ -851,7 +841,7 @@ const AFF = {
 const ADS = {
   aktif: true,
   client: "",
-  slot: { home_feed: "", rail: "", katalog_atas: "", detail_tengah: "", banding_atas: "", berita_atas: "" }
+  slot: { home_feed: "", rail: "", katalog_atas: "", detail_tengah: "", banding_atas: "" }
 };
 
 module.exports.AFF = AFF;

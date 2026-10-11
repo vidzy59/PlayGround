@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const { PHONES, NEWS, AFF, ADS } = require("./data");
+const { PHONES, AFF, ADS } = require("./data");
 
 const app = express();
 app.disable("x-powered-by");
@@ -32,9 +32,8 @@ app.get("/robots.txt", (req, res) => {
 });
 app.get("/sitemap.xml", (req, res) => {
   const base = (req.protocol + "://" + req.get("host")).replace(/\/$/, "");
-  const urls = ["/", "/#/phones", "/#/compare", "/#/news", "/#/favorites"]
-    .concat(PHONES.map((p) => "/#/phone/" + p.id))
-    .concat(NEWS.map((n) => "/#/news/" + n.id));
+  const urls = ["/", "/#/phones", "/#/compare", "/#/favorites"]
+    .concat(PHONES.map((p) => "/#/phone/" + p.id));
   res.type("application/xml").send(
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     urls.map((u) => "  <url><loc>" + base + "/" + u.replace(/^\/+/, "") + "</loc></url>").join("\n") +
@@ -92,26 +91,9 @@ function minPrice(p) {
   return Math.min(...p.prices.map((x) => x.harga));
 }
 function escapeReg(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
-// Riwayat harga deterministik 6 bulan (gaya Kimovil): tren turun + noise dari hash id.
-// Untuk apa: memberi konteks "murah sekarang atau tunggu". Ditaruh di detail.
-// Akibat jika tidak ada: user hanya lihat harga sesaat, tidak bisa menilai momentum.
-function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) { h = ((h << 5) - h + s.charCodeAt(i)) | 0; } return Math.abs(h); }
-const BULAN_LABEL = ["Apr 2026", "Mei 2026", "Jun 2026", "Jul 2026", "Agu 2026", "Sep 2026"];
-function priceHistory(p) {
-  const kini = minPrice(p);
-  const h = hashStr(p.id);
-  const dropTotal = 0.06 + ((h % 13) / 100); // total penurunan 6-18% selama 6 bulan
-  const pts = [];
-  for (let i = 5; i >= 0; i--) {
-    const f = i / 5; // 1 = 6 bulan lalu, 0 = kini
-    const noise = (((h >> (i * 2)) % 7) - 3) / 400; // +-0.75%
-    const val = Math.round((kini * (1 + dropTotal * f) * (1 + noise)) / 1000) * 1000;
-    pts.push({ bulan: BULAN_LABEL[5 - i], harga: val });
-  }
-  pts[5].harga = kini;
-  const awal = pts[0].harga;
-  return { points: pts, awal, kini, selisih: awal - kini, persen: Math.round(((awal - kini) / awal) * 1000) / 10 };
-}
+/* Riwayat harga sintetis DIHAPUS (keputusan solo-dev): tren 6 bulan sebelumnya
+   dibangkitkan dari hash id — data karangan yang menyamar sebagai pantauan live.
+   Harga yang tampil kini hanya harga toko statis + tombol BELI afiliasi. */
 
 app.get("/api/health", (req, res) => res.json({ ok: true, totalPhones: PHONES.length }));
 
@@ -243,52 +225,13 @@ app.get("/api/compare", (req, res) => {
   res.json(result);
 });
 
-app.get("/api/news", (req, res) => res.json(NEWS));
-
-app.get("/api/news/:id", (req, res) => {
-  const n = NEWS.find((x) => String(x.id) === String(req.params.id));
-  if (!n) return res.status(404).json({ error: "Berita tidak ditemukan." });
-  const terkait = (n.terkait || []).map((id) => PHONES.find((p) => p.id === id)).filter(Boolean).map((p) => ({ ...withRating(p), hargaTermurah: minPrice(p) }));
-  res.json({ ...n, terkait });
-});
+/* /api/news* DIHAPUS: rubrik butuh update editorial rutin — beban solo-dev.
+   /api/phones/:id/price-history + /api/drops DIHAPUS: basisnya data sintetis.
+   /api/stats DIHAPUS: endpoint mati, tak ada pemanggil di frontend. */
 
 // Config afiliasi + iklan untuk frontend (tanpa data sensitif lain).
 app.get("/api/aff", (req, res) => res.json(AFF || { aktif: false }));
 app.get("/api/ads", (req, res) => res.json(ADS || { aktif: false }));
-
-// Riwayat harga per HP (Kimovil-style)
-app.get("/api/phones/:id/price-history", (req, res) => {
-  const p = PHONES.find((x) => x.id === req.params.id);
-  if (!p) return res.status(404).json({ error: "HP tidak ditemukan." });
-  res.json({ id: p.id, name: p.name, ...priceHistory(p) });
-});
-
-// Penurunan harga terbesar (untuk blok beranda). Diurutkan by persen turun.
-app.get("/api/drops", (req, res) => {
-  const limit = Math.min(8, Math.max(1, parseInt(req.query.limit || "5", 10) || 5));
-  const rows = PHONES.map((p) => {
-    const h = priceHistory(p);
-    return { ...withRating(p), hargaTermurah: minPrice(p), turunRp: h.selisih, turunPersen: h.persen };
-  }).sort((a, b) => b.turunPersen - a.turunPersen).slice(0, limit);
-  res.json(rows);
-});
-
-// Statistik database untuk masthead dan blok beranda
-app.get("/api/stats", (req, res) => {
-  const mins = PHONES.map(minPrice);
-  const sum = mins.reduce((a, b) => a + b, 0);
-  const nfc = PHONES.filter((p) => p.comms.nfc).length;
-  const g5 = PHONES.filter((p) => p.network.dukungan5G).length;
-  res.json({
-    total: PHONES.length,
-    brands: new Set(PHONES.map((p) => p.brand)).size,
-    termurah: Math.min(...mins),
-    termahal: Math.max(...mins),
-    rerata: Math.round(sum / mins.length),
-    denganNFC: nfc,
-    dengan5G: g5
-  });
-});
 
 // fallback SPA
 app.get("*", (req, res) => {

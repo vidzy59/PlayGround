@@ -122,9 +122,6 @@ h1,h2,h3,h4{margin:0;line-height:1.3}
 .lihat-toggle{display:flex;gap:0;margin-bottom:8px;border:1px solid #a9adb3}
 .lihat-toggle button{flex:1;border:0;background:#f0f1f3;font-size:11px;font-weight:700;padding:6px;cursor:pointer;color:#555}
 .lihat-toggle button.pilih-view{background:#3b3f45;color:#fff}
-/* tren harga ala kimovil */
-.tren-wrap{border:1px solid #d4d7db;background:#fff;padding:8px;overflow-x:auto}
-.tren-wrap canvas{width:100%;height:auto;display:block}
 /* sorotan item autocomplete via keyboard */
 .autocomplete button.ac-aktif{background:#e8eff7}
 /* distribusi rating opini tertulis */
@@ -193,16 +190,21 @@ tr.termurah td{background:#f2f9f2}
 .cmp-head-val{text-align:center}
 .cmp-head-val .hapus-link{color:#ffb38a}
 .cmp-head-val small{color:#cfd4d9;font-weight:400}
+/* duel 2 HP: nilai kiri-kanan, nama spek di tengah (pola versus). Tanpa geser
+   horizontal: kolom mengecil mengikuti layar agar label tengah selalu terlihat.
+   Garis pemenang menghadap tengah dari kedua sisi. */
+.cmp.duel2{min-width:0}
+.cmp-baris.duel2,.cmp-sticky-grid.duel2{grid-template-columns:minmax(0,1fr) 132px minmax(0,1fr)}
+.cmp-sticky-grid.duel2{min-width:0}
+.duel2 .cmp-label{position:static;text-align:center;box-shadow:none}
+.duel2 .cmp-head-label{text-align:center}
+.cmp-val.kanan{text-align:right}
+.cmp-head-val.kanan{text-align:right}
+.cmp-head-val.kiri{text-align:left}
+.cmp-val.menang.mkiri{box-shadow:inset -3px 0 0 #1c6b1c}
 .cmp-kaki>div{background:#f4f5f6;font-size:12px}
 .cmp-sek{background:#e8eaed;border:1px solid #d4d7db;border-bottom:0;margin-top:10px}
 .cmp-sek:first-child{margin-top:0}
-/* berita */
-.berita-baris{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;padding:10px 6px;border-bottom:1px solid #e3e5e8}
-.berita-tgl{border:1px solid #d4d7db;background:#f4f5f6;text-align:center;padding:6px 4px;font-size:11px;color:#555}
-.berita-tgl b{display:block;font-size:16px;color:#222}
-.berita-judul{font-size:14px;font-weight:700}
-.berita-ringkas{font-size:12.5px;color:#444}
-.tag{font-size:10px;font-weight:700;background:#0d5cb6;color:#fff;padding:1px 6px;text-transform:uppercase}
 /* kanan rail */
 .ol-pop{margin:0;padding:0;list-style:none;font-size:12px}
 .ol-pop li{padding:6px 0;border-bottom:1px dotted #cfd3d8;display:flex;gap:8px}
@@ -261,6 +263,24 @@ tr.termurah td{background:#f2f9f2}
 .tunggal{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid #d4d7db;background:#f4f5f6;padding:10px;flex-wrap:wrap}
 /* kalimat vonis ramping: satu baris kesimpulan, angka ada di Ringkasan skor */
 .vonis-kalimat{border:1px solid #bcd8bc;background:#f4faf4;padding:7px 10px;margin:10px 0 0;font-size:12.5px}
+/* strip skor duel (pola NanoReview): angka besar + nama, pemenang berbingkai hijau */
+.skor-duel{display:flex;gap:8px;align-items:stretch;margin:10px 0 0}
+.skor-duel-item{flex:1 1 0;border:1px solid #d4d7db;background:#f4f5f6;text-align:center;padding:8px 6px;min-width:0}
+.skor-duel-item b{display:block;font-size:26px;color:#0d5cb6;line-height:1.1}
+.skor-duel-item.juara{border:2px solid #1c6b1c;background:#f2f9f2}
+.skor-duel-item.juara b{color:#1c6b1c}
+.skor-duel-item span{display:block;font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skor-duel-item small{color:#6b7076;font-size:11px}
+.skor-vs{align-self:center;font-weight:700;color:#8f959c;font-size:12px;flex:0 0 auto}
+/* perbedaan utama (pola NanoReview "reasons to consider"): kartu alasan per HP */
+.beda-utama{margin:10px 0 0}
+.beda-utama h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.beda-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:6px}
+.beda-kartu{border:1px solid #d4d7db;background:#fff;padding:8px 10px;font-size:12.5px;min-width:0}
+.beda-kartu>b{display:block;margin-bottom:4px}
+.beda-kartu ul{margin:0;padding-left:16px}
+.beda-kartu li{margin:2px 0}
+.beda-kartu li.muted{color:#6b7076;list-style:none;margin-left:-16px}
 /* bilah aksi komparator: rapi dalam satu bingkai, bukan tombol lepas */
 .cmp-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;background:#f4f5f6;border:1px solid #d4d7db;padding:6px 8px}
 .selisih{display:block;font-size:11px;font-weight:400;color:#6b7076}
@@ -322,7 +342,10 @@ input,select,textarea{min-width:0}
   .baris-kanan{grid-column:2;text-align:left}
   .nav-kanan{display:none}
   table.spek th{width:120px}
+  /* duel: kolom tengah lebih ramping agar nilai muat di layar kecil */
+  .cmp-baris.duel2,.cmp-sticky-grid.duel2{grid-template-columns:minmax(0,1fr) 104px minmax(0,1fr)}
   /* target sentuh minimal ~44px di layar kecil */
+  .skor-duel-item b{font-size:20px}
   .tombol-mini{padding:8px 12px}
   .warna-dot{width:28px;height:28px}
   .chip button{padding:4px 10px}
