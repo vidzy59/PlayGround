@@ -191,7 +191,6 @@ tr.termurah td{background:#f2f9f2}
 .cmp-sticky-grid>div{padding:7px 8px;border:1px solid #3b3f45;min-width:0;overflow-wrap:break-word}
 .cmp-head-label{background:#2c3034;font-weight:700;position:relative;z-index:2;box-shadow:1px 0 0 #2c3034}
 .cmp-head-val{text-align:center}
-.cmp-head-val .hapus-link{color:#ffb38a}
 .cmp-head-val small{color:#cfd4d9;font-weight:400}
 .cmp-kaki>div{background:#f4f5f6;font-size:12px}
 .cmp-sek{background:#e8eaed;border:1px solid #d4d7db;border-bottom:0;margin-top:10px}
@@ -234,7 +233,8 @@ tr.termurah td{background:#f2f9f2}
 .slot-panel{position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:60;border:1px solid #8f959c;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.14)}
 .slot-cari{width:100%;padding:7px 9px;border:0;border-bottom:1px solid #d4d7db;font-size:12.5px;outline:none;box-sizing:border-box}
 .slot-daftar{overflow-y:auto;max-height:264px}
-.slot-item{display:flex;width:100%;gap:8px;align-items:baseline;border:0;border-bottom:1px solid #eee;background:#fff;padding:7px 9px;cursor:pointer;text-align:left;font-size:12.5px;box-sizing:border-box}
+.slot-item{display:flex;width:100%;gap:8px;align-items:center;border:0;border-bottom:1px solid #eee;background:#fff;padding:7px 9px;cursor:pointer;text-align:left;font-size:12.5px;box-sizing:border-box}
+.slot-item>svg{flex:none}
 .slot-item:hover,.slot-item.aktif{background:#e8eff7}
 .slot-item.sudah{opacity:.45;cursor:default}
 .slot-item small{color:#6b7076}
@@ -263,7 +263,6 @@ tr.termurah td{background:#f2f9f2}
 /* bilah aksi komparator: rapi dalam satu bingkai, bukan tombol lepas */
 .cmp-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;background:#f4f5f6;border:1px solid #d4d7db;padding:6px 8px}
 .selisih{display:block;font-size:11px;font-weight:400;color:#6b7076}
-.hapus-link{background:none;border:0;color:#b00020;font-size:11px;cursor:pointer;padding:0;text-decoration:underline}
 /* chip filter aktif: untuk apa: visibilitas state + hapus satuan. Tanpa ini user lupa apa yang memfilter. */
 .chip-wrap{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0 0}
 .chip{display:inline-flex;gap:6px;align-items:center;background:#3b3f45;color:#fff;font-size:11px;font-weight:700;padding:3px 4px 3px 9px}
@@ -326,6 +325,10 @@ input,select,textarea{min-width:0}
   .cmp-baris .cmp-label{grid-column:1/-1;position:static;box-shadow:none;text-align:center;border-bottom:0}
   .cmp-sticky-grid{min-width:0;grid-template-columns:repeat(var(--n,2),minmax(0,1fr))}
   .cmp-head-label{display:none}
+  /* kepala sticky ramping: nama satu baris (ellipsis) + varian kecil */
+  .cmp-head-val{font-size:11.5px;padding:5px 6px}
+  .cmp-head-val b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #keAtas{padding:6px 9px;font-size:10px;opacity:.9;right:10px;bottom:12px}
   .baris-hp{grid-template-columns:54px minmax(0,1fr)}
   .baris-kanan{grid-column:2;text-align:left}
   .nav-kanan{display:none}

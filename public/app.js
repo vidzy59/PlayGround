@@ -199,15 +199,14 @@
       try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
     });
   }
-  function iklanHTML(slot, format) {
+  function iklanHTML(slot) {
     if (!adsCfg || adsCfg.aktif === false) return "";
-    var label = format === "box" ? "300x250" : "Responsif";
     var sid = adsCfg.slot && adsCfg.slot[slot];
     var isi;
     if (adsCfg.client && sid) {
       isi = '<ins class="adsbygoogle" style="display:block" data-ad-client="' + esc(adsCfg.client) + '" data-ad-slot="' + esc(sid) + '" data-ad-format="auto" data-full-width-responsive="true"></ins>';
     } else {
-      isi = '<div class="iklan-kosong">Ruang iklan ' + esc(label) + ' tersedia<br><small>Pasang ID AdSense di data.js (ADS) atau hubungi redaksi untuk pasang di sini</small></div>';
+      isi = '<div class="iklan-kosong">Ruang iklan tersedia<br><small>Hubungi redaksi untuk beriklan di sini</small></div>';
     }
     return '<div class="iklan" role="complementary" aria-label="Iklan"><span class="iklan-label">IKLAN</span>' + isi + "</div>";
   }
@@ -225,8 +224,13 @@
     return "smooth";
   }
   keAtas.onclick = function () { window.scrollTo({ top: 0, behavior: gerakSkrol() }); };
+  /* Hanya tampil saat menggulir naik: tombol fixed takkan menutupi konten
+     yang sedang dibaca (tabel, form, grafik). */
+  var posTerakhir = 0;
   window.addEventListener("scroll", function () {
-    keAtas.classList.toggle("tampil", window.scrollY > 600);
+    var y = window.scrollY, naik = y < posTerakhir;
+    posTerakhir = y;
+    keAtas.classList.toggle("tampil", y > 600 && naik);
   }, { passive: true });
   /* Judul tab per halaman: penting untuk publish (bookmark, riwayat, pembaca layar). */
   var JUDUL_DASAR = "SpekHP Arena - Spesifikasi, Harga dan Komparasi HP";
@@ -800,7 +804,7 @@
         function tulisDistribusi() {
           var box = document.getElementById("distBox");
           if (!box) return;
-          if (!p.ulasan.length) { box.innerHTML = '<span class="hasil-info">Belum ada opini tertulis untuk distribusi.</span>'; return; }
+          if (!p.ulasan.length) { box.innerHTML = '<span class="hasil-info">Belum ada opini tertulis.</span>'; return; }
           var cnt = [0, 0, 0, 0, 0, 0];
           p.ulasan.forEach(function (u) { if (u.rating >= 1 && u.rating <= 5) cnt[u.rating]++; });
           var max = Math.max(cnt[1], cnt[2], cnt[3], cnt[4], cnt[5], 1);
@@ -852,8 +856,19 @@
           ctx.fillStyle = "rgba(13,92,182,0.10)"; ctx.fill();
           ctx.fillStyle = "#0d5cb6";
           points.forEach(function (pt, i) { ctx.beginPath(); ctx.arc(X(i), Y(pt.harga), 3.5, 0, 7); ctx.fill(); });
-          ctx.fillStyle = "#333";
-          points.forEach(function (pt, i) { if (i % 2 === 0 || i === points.length - 1) ctx.fillText(pt.bulan, X(i) - 24, H - 8); });
+          /* Label bulan anti-tabrakan: tengah di titiknya, dijepit dalam plot,
+             dilewati bila menabrak label sebelumnya (titik akhir sudah
+             ditandai label harga merah, jadi aman dilewati di layar sempit). */
+          ctx.fillStyle = "#333"; ctx.font = "11px Arial";
+          var akhirX = -9999;
+          points.forEach(function (pt, i) {
+            if (!(i % 2 === 0 || i === points.length - 1)) return;
+            var tw = ctx.measureText(pt.bulan).width;
+            var cx = X(i) - tw / 2;
+            if (i === points.length - 1) cx = Math.min(cx, W - padR - tw);
+            else cx = Math.max(cx, 4);
+            if (i === 0 || cx - akhirX >= 6) { ctx.fillText(pt.bulan, cx, H - 8); akhirX = cx + tw; }
+          });
           var lx = X(points.length - 1);
           ctx.fillStyle = "#b00020"; ctx.font = "bold 12px Arial";
           ctx.fillText(formatIDR(points[points.length - 1].harga), Math.min(lx - 30, W - 110), Y(points[points.length - 1].harga) - 8);
@@ -968,7 +983,7 @@
       }
       app.innerHTML = '<div class="crumbs"><a href="#/">Beranda</a> / <b>Bandingkan HP</b></div>' +
         '<div style="padding:10px 12px"><div class="judul-blok">Bandingkan HP</div>' +
-        '<p class="hasil-info">Pilih sampai tiga HP. Yang berbeda dicetak tebal; garis hijau = pemenang tunggal kategorinya.</p>' +
+        '<p class="hasil-info">Pilih sampai tiga HP. Yang berbeda dicetak tebal; garis hijau menandai pemenang tunggal kategorinya.</p>' +
         '<div class="banding-pilih">' + [0, 1, 2].map(function (i) {
           return '<div class="slot-hp"><label id="slotLabel' + i + '">HP ' + (i + 1) + "</label>" +
             '<div class="slot-baris"><button class="slot-tampil' + (byId[ids[i]] ? "" : " kosong") + '" data-pilih="' + i + '" type="button" aria-haspopup="listbox" aria-expanded="false" id="slotBtn' + i + '">' + slotBtnHTML(ids[i]) + "</button>" +
@@ -1228,7 +1243,7 @@
           var kepala = '<div class="cmp-sticky"><div class="cmp-sticky-grid" id="cmpStickyGrid" style="--n:' + rows.length + '">' +
             '<div class="cmp-head-label" id="cmpHeadLabel">Model</div>' +
             rows.map(function (r) {
-              return '<div class="cmp-head-val"><b>' + esc(namaPendek(r)) + '</b> <button class="hapus-link" data-hapus="' + esc(r.id) + '" type="button">Hapus</button><br><small>' + esc(r.memory.ramUtama) + "GB · " + esc(r.memory.storageUtama) + "GB</small></div>";
+              return '<div class="cmp-head-val"><b>' + esc(namaPendek(r)) + "</b><br><small>" + esc(r.memory.ramUtama) + "GB · " + esc(r.memory.storageUtama) + "GB</small></div>";
             }).join("") + "</div></div>";
           box.innerHTML = duelHead() + vonisBar + kepala + '<div class="scroll-x" id="cmpScroll"><div class="cmp" style="--n:' + rows.length + '">' +
             /* Ringkasan skor di seksi pertama (pola Kimovil): baca pemenang tiap
@@ -1314,14 +1329,6 @@
               box.querySelectorAll('div[data-sek="' + key + '"]').forEach(function (el) { el.classList.toggle("tutup", !!sekTutup[key]); });
               btn.setAttribute("aria-expanded", sekTutup[key] ? "false" : "true");
               btn.innerHTML = (sekTutup[key] ? "&#9656; " : "&#9662; ") + esc(btn.getAttribute("data-judul")) + ' <span class="hasil-info">(' + esc(btn.getAttribute("data-jml")) + ")</span>";
-            };
-          });
-          box.querySelectorAll("[data-hapus]").forEach(function (btn) {
-            btn.onclick = function () {
-              var buang = btn.getAttribute("data-hapus");
-              /* In-place: tanpa location.hash agar tidak render ulang + lompat scroll. */
-              ids = ids.map(function (x) { return x === buang ? null : x; });
-              syncURL(); gambarSlot(); muat();
             };
           });
         }).catch(function (err) { box.innerHTML = '<div class="error-box">' + esc(err.message) + "</div>"; });
