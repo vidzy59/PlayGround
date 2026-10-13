@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const fs = require("fs");
 const { PHONES, NEWS, AFF, ADS } = require("./data");
 
 const app = express();
@@ -10,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json({ limit: "256kb" }));
-// API tidak boleh di-cache agar harga/ulasan selalu segar
+// API tidak boleh di-cache agar harga selalu segar
 app.use("/api", (req, res, next) => {
   res.setHeader("Cache-Control", "no-store");
   next();
@@ -42,76 +41,15 @@ app.get("/sitemap.xml", (req, res) => {
   );
 });
 
-// ---- storage ulasan (file JSON sederhana, full-stack persistence) ----
-const REVIEWS_FILE = path.join(__dirname, "reviews.json");
-let reviewsStore = {};
-try {
-  if (fs.existsSync(REVIEWS_FILE)) {
-    reviewsStore = JSON.parse(fs.readFileSync(REVIEWS_FILE, "utf8") || "{}");
-  }
-} catch (e) {
-  reviewsStore = {};
-}
-function saveReviews() {
-  try {
-    fs.writeFileSync(REVIEWS_FILE, JSON.stringify(reviewsStore, null, 2));
-  } catch (e) { /* abaikan agar server tetap jalan */ }
-}
-// seed 2 ulasan per HP populer bila kosong
-const SEED_REVIEWS = {
-  "samsung-galaxy-s24-ultra": [
-    { nama: "Andi Pratama", rating: 5, judul: "Kamera zoom gila", isi: "Zoom 5x masih tajam banget, S Pen responsif. Baterai seharian penuh aman.", tanggal: "2026-08-10" },
-    { nama: "Sinta Dewi", rating: 4, judul: "Berat tapi puas", isi: "Agak berat 232g, tapi layar dan speaker terbaik yang pernah saya pakai.", tanggal: "2026-08-22" }
-  ],
-  "iphone-15-pro-max": [
-    { nama: "Rizky Ramadhan", rating: 5, judul: "Video sinematik juara", isi: "Pindah dari Android, hasil video ProRes jauh lebih stabil untuk kerja.", tanggal: "2026-07-15" }
-  ],
-  "xiaomi-redmi-note-13-pro": [
-    { nama: "Budi Santoso", rating: 5, judul: "Value terbaik 4 jutaan", isi: "Layar AMOLED 1.5K di harga segini tidak ada lawan. Charging 67W cepat.", tanggal: "2026-09-01" }
-  ]
-};
-for (const [id, arr] of Object.entries(SEED_REVIEWS)) {
-  if (!reviewsStore[id]) reviewsStore[id] = arr;
-}
-
-function getReviews(id) {
-  return Array.isArray(reviewsStore[id]) ? reviewsStore[id] : [];
-}
-function phoneRating(phone) {
-  const r = getReviews(phone.id);
-  if (!r.length) return { rating: phone.rating, count: phone.reviewCount };
-  const avgUser = r.reduce((a, b) => a + b.rating, 0) / r.length;
-  const blended = Math.round(((phone.rating * 0.7 + avgUser * 0.3) * 10)) / 10;
-  return { rating: blended, count: phone.reviewCount + r.length };
-}
+/* Rating tampil dari dataset (skor redaksi per tipe, tanpa ulasan pembaca):
+   tanpa form, tanpa file simpanan, tanpa moderasi. Nol beban operasional. */
 function withRating(p) {
-  const { rating, count } = phoneRating(p);
-  return { ...p, ratingLive: rating, reviewCountLive: count, userReviews: getReviews(p.id).length };
+  return { ...p, ratingLive: p.rating, reviewCountLive: p.reviewCount };
 }
 function minPrice(p) {
   return Math.min(...p.prices.map((x) => x.harga));
 }
 function escapeReg(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
-// Riwayat harga deterministik 6 bulan (gaya Kimovil): tren turun + noise dari hash id.
-// Untuk apa: memberi konteks "murah sekarang atau tunggu". Ditaruh di detail.
-// Akibat jika tidak ada: user hanya lihat harga sesaat, tidak bisa menilai momentum.
-function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) { h = ((h << 5) - h + s.charCodeAt(i)) | 0; } return Math.abs(h); }
-const BULAN_LABEL = ["Apr 2026", "Mei 2026", "Jun 2026", "Jul 2026", "Agu 2026", "Sep 2026"];
-function priceHistory(p) {
-  const kini = minPrice(p);
-  const h = hashStr(p.id);
-  const dropTotal = 0.06 + ((h % 13) / 100); // total penurunan 6-18% selama 6 bulan
-  const pts = [];
-  for (let i = 5; i >= 0; i--) {
-    const f = i / 5; // 1 = 6 bulan lalu, 0 = kini
-    const noise = (((h >> (i * 2)) % 7) - 3) / 400; // +-0.75%
-    const val = Math.round((kini * (1 + dropTotal * f) * (1 + noise)) / 1000) * 1000;
-    pts.push({ bulan: BULAN_LABEL[5 - i], harga: val });
-  }
-  pts[5].harga = kini;
-  const awal = pts[0].harga;
-  return { points: pts, awal, kini, selisih: awal - kini, persen: Math.round(((awal - kini) / awal) * 1000) / 10 };
-}
 
 app.get("/api/health", (req, res) => res.json({ ok: true, totalPhones: PHONES.length }));
 
@@ -182,7 +120,7 @@ app.get("/api/phones/:id", (req, res) => {
   const p = PHONES.find((x) => x.id === req.params.id);
   if (!p) return res.status(404).json({ error: "HP tidak ditemukan." });
   const full = withRating(p);
-  res.json({ ...full, hargaTermurah: minPrice(p), ulasan: getReviews(p.id) });
+  res.json({ ...full, hargaTermurah: minPrice(p) });
 });
 
 app.get("/api/phones/:id/similar", (req, res) => {
@@ -202,36 +140,9 @@ app.get("/api/phones/:id/similar", (req, res) => {
   res.json(scored.slice(0, 4).map((s) => ({ ...s.phone, hargaTermurah: s.hargaTermurah })));
 });
 
-app.post("/api/phones/:id/reviews", (req, res) => {
-  // Batas spam sederhana: maks 5 opini/menit per IP agar publish aman dari bot
-  const ip = (req.ip || req.connection.remoteAddress || "x").toString();
-  const now = Date.now();
-  if (!global.__rl) global.__rl = {};
-  const arr = (global.__rl[ip] || []).filter((t) => now - t < 60000);
-  if (arr.length >= 5) return res.status(429).json({ error: "Terlalu banyak opini. Coba lagi sebentar." });
-  arr.push(now);
-  global.__rl[ip] = arr;
-  const p = PHONES.find((x) => x.id === req.params.id);
-  if (!p) return res.status(404).json({ error: "HP tidak ditemukan." });
-  const nama = (req.body.nama || "").toString().trim().slice(0, 40);
-  const judul = (req.body.judul || "").toString().trim().slice(0, 80);
-  const isi = (req.body.isi || "").toString().trim().slice(0, 1000);
-  const rating = Number(req.body.rating);
-  if (!nama || !isi) return res.status(400).json({ error: "Nama dan isi ulasan wajib diisi." });
-  if (!Number.isInteger(rating) || rating < 1 || rating > 5) return res.status(400).json({ error: "Rating harus 1 sampai 5." });
-  if (!judul) return res.status(400).json({ error: "Judul ulasan wajib diisi." });
-  const entry = { nama, rating, judul, isi, tanggal: new Date().toISOString().slice(0, 10) };
-  if (!Array.isArray(reviewsStore[p.id])) reviewsStore[p.id] = [];
-  reviewsStore[p.id].unshift(entry);
-  saveReviews();
-  const { rating: r, count } = phoneRating(p);
-  res.status(201).json({ ok: true, ulasan: entry, ratingLive: r, reviewCountLive: count });
-});
-
 app.get("/api/compare", (req, res) => {
   /* Batas 12: halaman favorit memakai endpoint ini untuk menampilkan semua favorit,
-     sedangkan UI komparator membatasi 3 slot di sisi frontend. Batas 3 di sini
-     dulu bikin halaman favorit terpotong diam-diam (judul klaim N, tampil 3). */
+     sedangkan UI perbandingan membatasi 3 HP di sisi frontend. */
   const ids = (req.query.ids || "").toString().split(",").map((s) => s.trim()).filter(Boolean).slice(0, 12);
   if (!ids.length) return res.status(400).json({ error: "Pilih minimal 1 HP." });
   const result = [];
@@ -255,40 +166,6 @@ app.get("/api/news/:id", (req, res) => {
 // Config afiliasi + iklan untuk frontend (tanpa data sensitif lain).
 app.get("/api/aff", (req, res) => res.json(AFF || { aktif: false }));
 app.get("/api/ads", (req, res) => res.json(ADS || { aktif: false }));
-
-// Riwayat harga per HP (Kimovil-style)
-app.get("/api/phones/:id/price-history", (req, res) => {
-  const p = PHONES.find((x) => x.id === req.params.id);
-  if (!p) return res.status(404).json({ error: "HP tidak ditemukan." });
-  res.json({ id: p.id, name: p.name, ...priceHistory(p) });
-});
-
-// Penurunan harga terbesar (untuk blok beranda). Diurutkan by persen turun.
-app.get("/api/drops", (req, res) => {
-  const limit = Math.min(8, Math.max(1, parseInt(req.query.limit || "5", 10) || 5));
-  const rows = PHONES.map((p) => {
-    const h = priceHistory(p);
-    return { ...withRating(p), hargaTermurah: minPrice(p), turunRp: h.selisih, turunPersen: h.persen };
-  }).sort((a, b) => b.turunPersen - a.turunPersen).slice(0, limit);
-  res.json(rows);
-});
-
-// Statistik database untuk masthead dan blok beranda
-app.get("/api/stats", (req, res) => {
-  const mins = PHONES.map(minPrice);
-  const sum = mins.reduce((a, b) => a + b, 0);
-  const nfc = PHONES.filter((p) => p.comms.nfc).length;
-  const g5 = PHONES.filter((p) => p.network.dukungan5G).length;
-  res.json({
-    total: PHONES.length,
-    brands: new Set(PHONES.map((p) => p.brand)).size,
-    termurah: Math.min(...mins),
-    termahal: Math.max(...mins),
-    rerata: Math.round(sum / mins.length),
-    denganNFC: nfc,
-    dengan5G: g5
-  });
-});
 
 // fallback SPA
 app.get("*", (req, res) => {
