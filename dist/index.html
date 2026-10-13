@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PlayGround — Banding &amp; Daftar Produk</title>
+<style>
+:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#16212b;background:#f6f8fb;line-height:1.5}
+.wrap{max-width:960px;margin:0 auto;padding:24px 16px 64px}header.top{display:flex;justify-content:space-between;align-items:center;padding:14px 0}header.top strong{font-size:20px}nav a{margin-left:14px;color:#2456c8;text-decoration:none;font-size:14px}
+.hero{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:28px;margin:12px 0}h1{margin:0 0 8px;font-size:32px}p.sub{margin:0 0 18px;color:#4b5b6b}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.step{background:#f1f5ff;border:1px solid #d7e3ff;border-radius:10px;padding:14px}.step b{display:block;margin-bottom:4px}
+.cta-row{display:flex;gap:10px;margin-top:14px}.btn{appearance:none;border:0;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer}.btn-primary{background:#1f6feb;color:#fff}.btn-ghost{background:#eef2f7;color:#16212b}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px}footer{margin-top:28px;font-size:13px;color:#5b6b7c}footer a{color:#2456c8;margin-right:12px}
+@media(max-width:720px){.steps,.grid2{grid-template-columns:1fr}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><strong>PlayGround</strong><nav><a href="#banding">Banding</a><a href="#berita">Berita</a><a href="#kebijakan">Kebijakan</a></nav></header>
+<section class="hero" id="banding">
+<h1>Bandingkan produk, lalu daftar dalam 3 langkah.</h1>
+<p class="sub">Alur sederhana untuk solo dev: pilih produk → bandingkan → daftar. Tanpa riwayat harga, tanpa beban berat.</p>
+<div class="steps">
+<div class="step"><b>1. Pilih produk</b><span>Centang maksimal 3 produk, lalu tekan Bandingkan.</span></div>
+<div class="step"><b>2. Bandingkan</b><span>Tabel jelas: fitur, harga saat ini, kecocokan.</span></div>
+<div class="step"><b>3. Daftar</b><span>Satu formulir, langsung konfirmasi. Tanpa login berlapis.</span></div>
+</div>
+<div class="cta-row"><button class="btn btn-primary" type="button">Mulai Bandingkan</button><button class="btn btn-ghost" type="button">Lihat Berita</button></div>
+</section>
+<section class="grid2">
+<div class="card"><h2>Produk</h2><ul><li>Produk A — Rp 49rb/bln</li><li>Produk B — Rp 79rb/bln</li><li>Produk C — Rp 99rb/bln</li></ul><p>Harga saat ini saja. Riwayat harga disembunyikan agar ringan.</p></div>
+<div class="card" id="berita"><h2>Berita</h2><ul><li>Panduan memilih produk 2026</li><li>Update kebijakan privasi</li><li>Tips hemat untuk pemula</li></ul></div>
+</section>
+<footer id="kebijakan"><a href="#kebijakan">Kebijakan Privasi</a><a href="#kebijakan">Syarat &amp; Ketentuan</a><a href="#kebijakan">Kebijakan Cookie</a><a href="#kebijakan">Kebijakan Retensi</a><p>© 2026 PlayGround. Static build siap serve.</p></footer>
+</div>
+</body>
+</html>
