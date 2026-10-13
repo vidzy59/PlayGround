@@ -9,16 +9,21 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json({ limit: "256kb" }));
-// API tidak boleh di-cache agar harga selalu segar
-app.use("/api", (req, res, next) => {
+/* Cache API pendek (bukan no-store total): harga berubah hitungan jam,
+   bukan detik. Daftar/brand boleh dicache 60 dtk, detail 30 dtk —
+   hemat bandwidth dan render lebih cepat tanpa harga basi. */
+function cacheDetik(res, n) {
+  res.setHeader("Cache-Control", "public, max-age=" + n + ", must-revalidate");
+}
+function noCache(res) {
   res.setHeader("Cache-Control", "no-store");
-  next();
-});
+}
 // Header keamanan dasar + cache statis agar tidak tabrakan render dan hemat bandwidth
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "SAMEORIGIN");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   next();
 });
 app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h", etag: true }));
@@ -31,12 +36,19 @@ app.get("/robots.txt", (req, res) => {
 });
 app.get("/sitemap.xml", (req, res) => {
   const base = (req.protocol + "://" + req.get("host")).replace(/\/$/, "");
-  const urls = ["/", "/#/phones", "/#/compare", "/#/news", "/#/favorites"]
-    .concat(PHONES.map((p) => "/#/phone/" + p.id))
-    .concat(NEWS.map((n) => "/#/news/" + n.id));
+  const item = (u, lastmod) => "  <url><loc>" + base + "/" + u.replace(/^\/+/, "") + "</loc>" + (lastmod ? "<lastmod>" + lastmod + "</lastmod>" : "") + "</url>";
+  const urls = [
+    item("/", null),
+    item("/#/phones", null),
+    item("/#/compare", null),
+    item("/#/news", null),
+    item("/#/favorites", null)
+  ]
+    .concat(PHONES.map((p) => item("/#/phone/" + p.id, p.released || null)))
+    .concat(NEWS.map((n) => item("/#/news/" + n.id, n.tanggal || null)));
   res.type("application/xml").send(
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-    urls.map((u) => "  <url><loc>" + base + "/" + u.replace(/^\/+/, "") + "</loc></url>").join("\n") +
+    urls.join("\n") +
     "\n</urlset>"
   );
 });
@@ -50,10 +62,41 @@ function minPrice(p) {
   return Math.min(...p.prices.map((x) => x.harga));
 }
 function escapeReg(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+function isId(s) { return /^[a-z0-9-]{3,60}$/.test(String(s || "")); }
+function cleanSearch(s) { return String(s || "").trim().slice(0, 80); }
+/* Daftar ringkas: untuk tray compare, autocomplete, dan baris daftar.
+   Full object ~4KB/HP (pros/cons/detail/sensor); ringkas ~1KB.
+   24 HP = hemat ~70KB per muat compare. Detail/similar/compare tetap full. */
+function ringkasHP(p) {
+  const full = withRating(p);
+  return {
+    id: full.id, name: full.name, brand: full.brand, released: full.released,
+    launch: { rilis: (full.launch && full.launch.rilis) || full.released },
+    rating: full.rating, reviewCount: full.reviewCount,
+    ratingLive: full.ratingLive, reviewCountLive: full.reviewCountLive,
+    hits: full.hits, antutu: full.antutu,
+    colors: full.colors, colorHex: full.colorHex,
+    network: { dukungan5G: !!(full.network && full.network.dukungan5G) },
+    body: { berat: (full.body && full.body.berat) || "-" },
+    display: { ukuran: (full.display && full.display.ukuran) || "-", tipe: (full.display && full.display.tipe) || "-" },
+    platform: { chipset: (full.platform && full.platform.chipset) || "-" },
+    memory: { ramUtama: full.memory.ramUtama, storageUtama: full.memory.storageUtama },
+    battery: { kapasitas: full.battery.kapasitas },
+    prices: full.prices, hargaTermurah: minPrice(full)
+  };
+}
 
-app.get("/api/health", (req, res) => res.json({ ok: true, totalPhones: PHONES.length }));
+app.get("/api/health", (req, res) => { cacheDetik(res, 300); res.json({ ok: true, totalPhones: PHONES.length }); });
+
+app.get("/api/stats", (req, res) => {
+  cacheDetik(res, 300);
+  const map = {};
+  PHONES.forEach((p) => { map[p.brand] = (map[p.brand] || 0) + 1; });
+  res.json({ ok: true, totalPhones: PHONES.length, totalNews: NEWS.length, totalBrands: Object.keys(map).length });
+});
 
 app.get("/api/brands", (req, res) => {
+  cacheDetik(res, 300);
   const map = {};
   PHONES.forEach((p) => { map[p.brand] = (map[p.brand] || 0) + 1; });
   res.json(Object.entries(map).map(([brand, count]) => ({ brand, count })).sort((a, b) => a.brand.localeCompare(b.brand)));
@@ -61,13 +104,27 @@ app.get("/api/brands", (req, res) => {
 
 app.get("/api/phones", (req, res) => {
   try {
+    cacheDetik(res, 60);
     let out = PHONES.map(withRating);
-    const q = (req.query.search || "").toString().trim();
-    const brand = (req.query.brand || "").toString().trim();
+    const q = cleanSearch(req.query.search);
+    const brand = (req.query.brand || "").toString().trim().slice(0, 40);
     const minP = req.query.minPrice ? Number(req.query.minPrice) : null;
     const maxP = req.query.maxPrice ? Number(req.query.maxPrice) : null;
     const ram = req.query.ram ? Number(req.query.ram) : null;
     const storage = req.query.storage ? Number(req.query.storage) : null;
+    // Validasi angka: tolak negatif/gila agar filter tak menghasilkan kosong misterius
+    if ((minP !== null && (Number.isNaN(minP) || minP < 0 || minP > 999999999)) ||
+        (maxP !== null && (Number.isNaN(maxP) || maxP < 0 || maxP > 999999999))) {
+      return res.status(400).json({ error: "Rentang harga tidak valid." });
+    }
+    if (minP !== null && maxP !== null && minP > maxP) {
+      return res.status(400).json({ error: "Harga min lebih besar dari maks." });
+    }
+    if ((ram !== null && (Number.isNaN(ram) || ram < 0 || ram > 64)) ||
+        (storage !== null && (Number.isNaN(storage) || storage < 0 || storage > 2048))) {
+      return res.status(400).json({ error: "Filter memori tidak valid." });
+    }
+    const ringkas = req.query.ringkas === "1" || req.query.ringkas === "true";
     const only5G = req.query.only5G === "1" || req.query.only5G === "true";
     // Filter baru: baterai minimal (mAh) dan NFC. Untuk apa: baterai = daya tahan,
     // NFC = e-money/TapCash yang krusial di Indonesia. Ditaruh di finder + katalog.
@@ -96,6 +153,9 @@ app.get("/api/phones", (req, res) => {
       terbaru: (a, b) => new Date(b.released) - new Date(a.released),
       termurah: (a, b) => minPrice(a) - minPrice(b),
       termahal: (a, b) => minPrice(b) - minPrice(a),
+      /* Nilai-uang: AnTuTu per rupiah. Untuk pembeli yang tanya
+         "paling worth it apa?" tanpa buka satu-satu. */
+      nilai: (a, b) => (b.antutu / minPrice(b)) - (a.antutu / minPrice(a)),
       rating: (a, b) => b.ratingLive - a.ratingLive,
       nama: (a, b) => a.name.localeCompare(b.name)
     };
@@ -106,10 +166,9 @@ app.get("/api/phones", (req, res) => {
     const total = out.length;
     const pages = Math.max(1, Math.ceil(total / limit));
     const safePage = Math.min(page, pages);
-    const slice = out.slice((safePage - 1) * limit, safePage * limit).map((p) => ({
-      ...p,
-      hargaTermurah: minPrice(p)
-    }));
+    const slice = out.slice((safePage - 1) * limit, safePage * limit).map((p) => (
+      ringkas ? ringkasHP(p) : { ...p, hargaTermurah: minPrice(p) }
+    ));
     res.json({ data: slice, total, page: safePage, pages, limit });
   } catch (err) {
     res.status(500).json({ error: "Gagal memuat data ponsel." });
@@ -117,15 +176,19 @@ app.get("/api/phones", (req, res) => {
 });
 
 app.get("/api/phones/:id", (req, res) => {
+  if (!isId(req.params.id)) return res.status(400).json({ error: "ID HP tidak valid." });
   const p = PHONES.find((x) => x.id === req.params.id);
   if (!p) return res.status(404).json({ error: "HP tidak ditemukan." });
+  cacheDetik(res, 30);
   const full = withRating(p);
   res.json({ ...full, hargaTermurah: minPrice(p) });
 });
 
 app.get("/api/phones/:id/similar", (req, res) => {
+  if (!isId(req.params.id)) return res.status(400).json({ error: "ID HP tidak valid." });
   const p = PHONES.find((x) => x.id === req.params.id);
   if (!p) return res.status(404).json({ error: "HP tidak ditemukan." });
+  cacheDetik(res, 60);
   const low = minPrice(p);
   const scored = PHONES.filter((x) => x.id !== p.id).map((x) => {
     let score = 0;
@@ -145,27 +208,32 @@ app.get("/api/compare", (req, res) => {
      sedangkan UI perbandingan membatasi 3 HP di sisi frontend. */
   const ids = (req.query.ids || "").toString().split(",").map((s) => s.trim()).filter(Boolean).slice(0, 12);
   if (!ids.length) return res.status(400).json({ error: "Pilih minimal 1 HP." });
+  for (const id of ids) {
+    if (!isId(id)) return res.status(400).json({ error: "ID tidak valid: " + id });
+  }
   const result = [];
   for (const id of ids) {
     const p = PHONES.find((x) => x.id === id);
     if (!p) return res.status(404).json({ error: "ID tidak valid: " + id });
     result.push({ ...withRating(p), hargaTermurah: minPrice(p) });
   }
+  cacheDetik(res, 30);
   res.json(result);
 });
 
-app.get("/api/news", (req, res) => res.json(NEWS));
+app.get("/api/news", (req, res) => { cacheDetik(res, 300); res.json(NEWS); });
 
 app.get("/api/news/:id", (req, res) => {
   const n = NEWS.find((x) => String(x.id) === String(req.params.id));
   if (!n) return res.status(404).json({ error: "Berita tidak ditemukan." });
+  cacheDetik(res, 300);
   const terkait = (n.terkait || []).map((id) => PHONES.find((p) => p.id === id)).filter(Boolean).map((p) => ({ ...withRating(p), hargaTermurah: minPrice(p) }));
   res.json({ ...n, terkait });
 });
 
 // Config afiliasi + iklan untuk frontend (tanpa data sensitif lain).
-app.get("/api/aff", (req, res) => res.json(AFF || { aktif: false }));
-app.get("/api/ads", (req, res) => res.json(ADS || { aktif: false }));
+app.get("/api/aff", (req, res) => { cacheDetik(res, 300); res.json(AFF || { aktif: false }); });
+app.get("/api/ads", (req, res) => { cacheDetik(res, 300); res.json(ADS || { aktif: false }); });
 
 // fallback SPA
 app.get("*", (req, res) => {
