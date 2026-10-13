@@ -311,7 +311,7 @@ function favList() {
       '<div class="baris-spek"><b>' + esc(p.display.ukuran) + "</b>, " + esc(p.display.tipe.split(",")[0]) + " - <b>" + esc(p.platform.chipset.split("(")[0].trim()) + "</b> - <b>" + esc(p.memory.ramUtama) + "GB/" + esc(p.memory.storageUtama) + "GB</b> - " + esc(p.battery.kapasitas) + " mAh</div>" +
       '<div class="skor-kecil"><span class="rate-num' + kelasRate(r) + '">' + esc(r) + '</span> ' + bintangTeks(r) + " " + esc(countLive(p)) + " penilaian</div></div>" +
       '<div class="baris-kanan"><div class="harga-merah">' + formatIDR(h) + '</div><div class="harga-kecil">dari ' + esc(p.prices ? p.prices.length : 1) + ' toko</div>' +
-      '<div class="aksi-baris"><button class="tombol tombol-mini" data-compare="' + esc(p.id) + '" type="button">BANDING</button>' +
+      '<div class="aksi-baris"><button class="banding-link" data-compare="' + esc(p.id) + '" type="button">+ Banding</button>' +
       '<button class="bintang-fav' + (isFav(p.id) ? " suka" : "") + '" data-fav="' + esc(p.id) + '" type="button" title="Simpan ke favorit" aria-label="Simpan ' + esc(p.name) + ' ke favorit" aria-pressed="' + (isFav(p.id) ? "true" : "false") + '">' + (isFav(p.id) ? "★" : "☆") + "</button></div></div></div>";
   }
 
@@ -1139,7 +1139,7 @@ function favList() {
           if (wNilai >= 0) cepat.push("nilai-uang <b>" + esc(namaPendek(rows[wNilai])) + "</b> (" + nilaiTeks(wNilai) + " AnTuTu/Rp1 jt)");
           var vonisUmum;
           if (juaraUmum >= 0) {
-            vonisUmum = "<b>Pemenang: " + esc(rows[juaraUmum].name) + "</b> — " + alasan + " (" + esc(tallyTeks()) + ").";
+            vonisUmum = '<b class="vonis-nama">Pemenang: ' + esc(rows[juaraUmum].name) + "</b> — " + alasan + " (" + esc(tallyTeks()) + ").";
             if (juara.length !== 1 && cepat.length) {
               vonisUmum += '<span class="vonis-cepat">Pilihan cepat: ' + cepat.join(" · ") + ".</span>";
             }
@@ -1185,9 +1185,11 @@ function favList() {
              Tanpa rating dan tanpa tombol BELI ganda: rating ada di tabel,
              BELI ada di seksi "Harga dan pembelian" di akhir. */
           function duelHead() {
-            return '<div class="duel-head" style="--n:' + rows.length + '">' + rows.map(function (r) {
-              return '<div class="duel-kartu">' +
+            return '<div class="duel-head" style="--n:' + rows.length + '">' + rows.map(function (r, ri) {
+              var isJuara = (typeof juaraUmum !== "undefined" && juaraUmum === ri);
+              return '<div class="duel-kartu' + (isJuara ? " juara" : "") + '">' +
                 '<button class="tray-hapus" data-lepas="' + esc(r.id) + '" type="button" aria-label="Hapus ' + esc(r.name) + ' dari perbandingan">×</button>' +
+                (isJuara ? '<span class="juara-badge">PEMENANG</span>' : "") +
                 '<a href="#/phone/' + esc(r.id) + '">' + phoneArt(r, 52, 68, 0) + "<br><b>" + esc(r.name) + "</b></a>" +
                 '<div class="skor-kecil">' + esc(r.memory.ramUtama) + "GB · " + esc(r.memory.storageUtama) + "GB</div>" +
                 '<div class="skor-kecil">' + esc(String(r.platform.chipset).split("(")[0].trim()) + " · " + esc(r.battery.kapasitas) + " mAh</div>" +
