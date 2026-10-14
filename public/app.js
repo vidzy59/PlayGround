@@ -185,14 +185,13 @@ function favList() {
     perbandingan: "Perbandingan",
     tandaiBeda: "Tandai perbedaan",
     hanyaBeda: "Tampilkan perbedaan saja",
-    nilaiUang: "Rasio performa-harga",
-    anggaran: "anggaran",
+    nilaiUang: "Nilai terbaik",
     duel: "Perbandingan populer",
     salinTautan: "Salin tautan",
     aturUlang: "Atur ulang",
-    tambahPerangkat: "Tambah perangkat",
-    hasil: "Hasil penyaringan",
-    semuaPerangkat: "Semua perangkat",
+    tambahPerangkat: "Tambah HP",
+    hasil: "Hasil filter",
+    semuaPerangkat: "Semua HP",
     spesifikasi: "Spesifikasi"
   };
   /* Breadcrumb baku: Beranda / Bagian / Judul. Satu format di semua rute
@@ -336,10 +335,10 @@ function favList() {
     document.getElementById("utilTanggal").textContent = hari + ", " + d.getDate() + " " + bl + " " + d.getFullYear() + " - Database HP Indonesia, harga IDR";
   } catch (e) {}
   PhoneService.statistik().then(function (h) {
-    document.getElementById("mastStat").innerHTML = "<b>" + esc(h.totalPhones) + "</b><span>tipe HP</span>";
+    document.getElementById("mastStat").innerHTML = "<b>" + esc(h.totalPhones) + "</b><span>model HP</span>";
   }).catch(function () {
     api("/api/health").then(function (h) {
-      document.getElementById("mastStat").innerHTML = "<b>" + esc(h.totalPhones) + "</b><span>tipe HP</span>";
+      document.getElementById("mastStat").innerHTML = "<b>" + esc(h.totalPhones) + "</b><span>model HP</span>";
     }).catch(function () {});
   });
 
@@ -372,19 +371,6 @@ function favList() {
       '<button class="bintang-fav' + (isFav(p.id) ? " suka" : "") + '" data-fav="' + esc(p.id) + '" type="button" title="Simpan ke favorit" aria-label="Simpan ' + esc(p.name) + ' ke favorit" aria-pressed="' + (isFav(p.id) ? "true" : "false") + '">' + (isFav(p.id) ? "★" : "☆") + "</button></div></div></div>";
   }
 
-  function kartuHP(p) {
-    var h = hargaMin(p), r = rateLive(p);
-    return '<a class="hp-card" href="#/phone/' + esc(p.id) + '">' +
-      '<span class="hp-card-thumb">' + phoneArt(p) + "</span>" +
-      '<span class="hp-card-isi">' +
-      '<span class="hp-card-brand">' + esc(p.brand) + (p.network && p.network.dukungan5G ? ' <span class="tag5g">5G</span>' : "") + "</span>" +
-      '<span class="hp-card-nama">' + esc(p.name) + "</span>" +
-      '<span class="hp-card-spek">' + esc(p.display.ukuran) + " - " + esc(p.memory.ramUtama) + "GB/" + esc(p.memory.storageUtama) + "GB - " + esc(p.battery.kapasitas) + " mAh</span>" +
-      "</span>" +
-      '<span class="hp-card-kaki"><span class="harga-merah">' + formatIDR(h) + '</span><span class="rate-num' + kelasRate(r) + '">' + esc(r) + "</span></span>" +
-      "</a>";
-  }
-
   function beritaBaris(n) {
     return '<div class="berita-baris" data-href="#/news/' + esc(n.id) + '"><div class="berita-tgl"><b>' + esc(n.tanggal.slice(8, 10)) + "</b>" + bulanTahun(n.tanggal) + '</div><div class="min0"><span class="tag">' + esc(n.kategori) + '</span> <a class="berita-judul" href="#/news/' + esc(n.id) + '">' + esc(n.judul) + '</a><div class="berita-ringkas">' + esc(n.ringkasan) + "</div></div></div>";
   }
@@ -398,7 +384,7 @@ function favList() {
     var optBrand = '<option value="Semua">Semua merek</option>' + brands.map(function (b) {
       return '<option value="' + esc(b.brand) + '"' + (state.brand === b.brand ? " selected" : "") + ">" + esc(b.brand) + " (" + b.count + ")</option>";
     }).join("");
-    return '<div class="finder-judul">Phone Finder</div><div class="finder-grup">' +
+    return '<div class="finder-judul">Pencari HP</div><div class="finder-grup">' +
       '<label>Kata kunci</label><input type="text" id="fSearch" value="' + esc(state.search || "") + '" placeholder="Nama / chipset">' +
       '<label>Merek</label><select id="fBrand">' + optBrand + "</select>" +
       '<label>Harga min (Rp)</label><input type="number" id="fMin" min="0" step="100000" value="' + esc(state.minPrice || "") + '" placeholder="Min. harga">' +
@@ -411,7 +397,7 @@ function favList() {
       [[4000, "4000 mAh+"], [4500, "4500 mAh+"], [5000, "5000 mAh+"]].map(function (o) { return '<option value="' + o[0] + '"' + (String(state.minBattery || "") === String(o[0]) ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select>" +
       '<label class="finder-cek polos"><input type="checkbox" id="f5g" class="cekbox"' + (state.only5G ? " checked" : "") + "> Hanya 5G</label>" +
       '<label class="finder-cek polos"><input type="checkbox" id="fWls" class="cekbox"' + (state.onlyWireless ? " checked" : "") + "> Ada wireless charging</label>" +
-      '<button class="tombol tombol-primer tombol" id="fTerapkan" type="button">TERAPKAN FILTER</button>' +
+      '<button class="tombol tombol-primer tombol" id="fTerapkan" type="button">Terapkan</button>' +
       (compact ? "" : '<button class="tombol tombol-blok" id="fReset" type="button">' + COPY.aturUlang + "</button>") +
       "</div>";
   }
@@ -591,36 +577,25 @@ function favList() {
       PhoneService.merek(),
       PhoneService.daftar({ sort: "populer", limit: 12, ringkas: 1 }),
       PhoneService.daftar({ sort: "terbaru", limit: 6, ringkas: 1 }),
-      PhoneService.berita(),
-      PhoneService.statistik()
+      PhoneService.berita()
     ]).then(function (res) {
-      var brands = res[0], populer = res[1], terbaru = res[2], news = res[3], stat = res[4];
+      var brands = res[0], populer = res[1], terbaru = res[2], news = res[3];
       var murah = populer.data.filter(function (p) { return hargaMin(p) < 5000000; }).slice(0, 4);
       var turun = murah.length ? murah : populer.data.slice(0, 4);
-      var jmlHP = stat.totalPhones || populer.total, jmlMerek = stat.totalBrands || brands.length, jmlBerita = stat.totalNews || news.length;
       app.innerHTML =
-        crumb([{ teks: "Beranda" }]) +
-        '<div class="home">' +
-        '<section class="beranda-hero">' +
-        '<div class="hero-txt">' +
-        '<h1 class="hero-judul">Spesifikasi, harga, dan perbandingan HP Indonesia</h1>' +
-        '<p class="hero-sub">Bandingkan spesifikasi dan harga dari ' + jmlMerek + ' merek dalam satu tempat. Data rapi dan ringkas, tanpa basa-basi.</p>' +
-        '<div class="hero-aksi">' +
-        '<a class="tombol tombol-primer" href="#/phones">Jelajahi katalog</a>' +
-        '<a class="tombol" href="#/compare">Bandingkan HP</a>' +
-        "</div></div>" +
-        '<div class="stat-strip">' +
-        '<div class="stat"><b>' + jmlHP + "</b><span>HP terdata</span></div>" +
-        '<div class="stat"><b>' + jmlMerek + "</b><span>Merek</span></div>" +
-        '<div class="stat"><b>' + jmlBerita + "</b><span>Berita</span></div>" +
-        '<div class="stat"><b>7</b><span>Toko harga</span></div>' +
-        "</div></section>" +
+        '<div class="kolom-home"><aside class="rail-kiri rail-nempel" id="finderHome">' + finderHTML(brands, {}, true) +
+        '<div class="mt10">' + blokJudul("Merek") + '<div class="merek-box">' +
+        brands.map(function (b) {
+          return '<div class="merek-baris"><a href="#/phones?brand=' + encodeURIComponent(b.brand) + '">' + esc(b.brand) + "</a> <span class=\"harga-kecil\">(" + b.count + ")</span></div>";
+        }).join("") + "</div></div></aside>" +
+        '<div class="badan">' +
+        '<button class="tombol tombol-mini filter-toggle" id="filterToggle" type="button" aria-expanded="false" aria-controls="finderHome">Filter</button>' +
         '<div class="blok">' + blokJudul("HP terbaru", "Indeks lengkap", "#/phones?sort=terbaru") +
-        '<div class="hp-grid">' + terbaru.data.map(kartuHP).join("") + "</div></div>" +
+        terbaru.data.map(barisHP).join("") + "</div>" +
         '<div class="blok">' + blokJudul("HP terpopuler", "Semua populer", "#/phones?sort=populer") +
         populer.data.slice(0, 6).map(barisHP).join("") + "</div>" +
         // Pintasan budget: untuk apa: mayoritas pembeli Indonesia mulai dari budget, bukan merek.
-        '<div class="blok">' + blokJudul("Cari berdasarkan anggaran") +
+        '<div class="blok">' + blokJudul("Cari berdasarkan harga") +
         '<div class="budget-grid">' +
         '<a href="#/phones?maxPrice=2000000"><b>Di bawah 2 jt</b><span>HP kedua dan pelajar</span></a>' +
         '<a href="#/phones?maxPrice=3500000"><b>Di bawah 3,5 jt</b><span>NFC dan 90Hz+ paling laris</span></a>' +
@@ -628,10 +603,10 @@ function favList() {
         '<a href="#/phones?minPrice=10000000"><b>Flagship 10 jt+</b><span>200MP, titanium, ProRes</span></a>' +
         "</div></div>" +
         '<div class="blok">' + blokJudul(COPY.duel) +
-        '<div class="duel-grid">' +
-        '<a class="duel-link" href="#/compare?ids=poco-x6-pro,xiaomi-redmi-note-13-pro"><b>POCO X6 Pro vs Redmi Note 13 Pro 5G</b><span class="harga-kecil">Beda Rp 500 ribu, beda kelas performa</span></a>' +
-        '<a class="duel-link" href="#/compare?ids=samsung-galaxy-s24-ultra,iphone-15-pro-max"><b>Galaxy S24 Ultra vs iPhone 15 Pro Max</b><span class="harga-kecil">Duel flagship 200MP vs 48MP</span></a>' +
-        '<a class="duel-link" href="#/compare?ids=infinix-note-40-pro,samsung-galaxy-a54"><b>Infinix Note 40 Pro vs Galaxy A54</b><span class="harga-kecil">3 jutaan wireless charging vs IP67</span></a>' +
+        '<div class="pad8 teks125">' +
+        '<div class="baris-titik"><a href="#/compare?ids=poco-x6-pro,xiaomi-redmi-note-13-pro"><b>POCO X6 Pro vs Redmi Note 13 Pro 5G</b></a> <span class="harga-kecil">- Beda Rp 500 ribu, beda kelas performa</span></div>' +
+        '<div class="baris-titik"><a href="#/compare?ids=samsung-galaxy-s24-ultra,iphone-15-pro-max"><b>Galaxy S24 Ultra vs iPhone 15 Pro Max</b></a> <span class="harga-kecil">- Duel flagship 200MP vs 48MP</span></div>' +
+        '<div class="baris-padat"><a href="#/compare?ids=infinix-note-40-pro,samsung-galaxy-a54"><b>Infinix Note 40 Pro vs Galaxy A54</b></a> <span class="harga-kecil">- 3 jutaan wireless charging vs IP67</span></div>' +
         "</div></div>" +
         iklanHTML("home_feed") +
         '<div class="dua-isi">' +
@@ -639,7 +614,9 @@ function favList() {
         news.slice(0, 4).map(beritaBaris).join("") + "</div>" +
         '<div class="blok">' + railKananHTML(populer.data, turun) + "</div>" +
         "</div>" +
-        "</div>";
+        "</div></div>";
+      ikatFinder({}, brands);
+      ikatFilterToggle("finderHome", false);
       prosesIklan();
     }).catch(function (err) {
       app.innerHTML = '<div class="error-box">Gagal memuat beranda: ' + esc(err.message) + "</div>";
@@ -735,7 +712,7 @@ function favList() {
           return '<div class="merek-baris"><a href="#/phones?brand=' + encodeURIComponent(b.brand) + '">' + esc(b.brand) + "</a> <span class=\"harga-kecil\">(" + b.count + ")</span></div>";
         }).join("") + "</div></div></aside>" +
         '<div class="badan">' +
-        '<button class="tombol tombol-mini filter-toggle" id="filterToggle" type="button" aria-expanded="false" aria-controls="finderKatalog">FILTER</button>' +
+        '<button class="tombol tombol-mini filter-toggle" id="filterToggle" type="button" aria-expanded="false" aria-controls="finderKatalog">Filter</button>' +
         '<div class="blok">' + blokJudul(judulKatalog) +
         iklanHTML("katalog_atas") +
         '<div id="chipBox">' + chipFilter() + "</div>" +
@@ -810,12 +787,12 @@ function favList() {
         if (state.minBattery) p.push("minBattery=" + encodeURIComponent(state.minBattery));
         if (state.only5G) p.push("only5G=1");
         if (state.onlyWireless) p.push("onlyWireless=1");
-        document.getElementById("hasilHP").innerHTML = '<div class="loading">Menyaring...</div>';
+        document.getElementById("hasilHP").innerHTML = '<div class="loading">Memuat hasil...</div>';
         PhoneService.daftar(Object.fromEntries(p.map(function (kv) {
           var i = kv.indexOf("=");
           return [decodeURIComponent(kv.slice(0, i)), decodeURIComponent(kv.slice(i + 1))];
         }))).then(function (res) {
-          document.getElementById("hasilInfo").textContent = res.total + " tipe ditemukan - hal. " + res.page + "/" + res.pages;
+          document.getElementById("hasilInfo").textContent = res.total + " HP ditemukan \u00b7 hal. " + res.page + "/" + res.pages;
           document.getElementById("hasilHP").innerHTML = res.data.length ? res.data.map(barisHP).join("") :
             '<div class="kosong"><b>Tidak ada HP yang cocok.</b><br>Longgarkan filter harga atau kata kunci.</div>';
           var pg = document.getElementById("paginasi"), btns = "";
@@ -886,7 +863,7 @@ function favList() {
           '<div class="warna-pilih">' + p.colors.map(function (c, i) {
             return '<button class="warna-dot' + (i === 0 ? " pilih" : "") + '" data-warna="' + i + '" title="' + esc(c) + '" style="background:' + esc(p.colorHex[i] || "#888") + '" aria-label="' + esc(c) + '"></button>';
           }).join("") + '</div><div class="warna-nama" id="warnaNama">' + esc(p.colors[0]) + " - tampak depan</div>" +
-          '<div class="tombol-tumpuk"><button class="tombol tombol-primer" id="btnBanding" type="button">Bandingkan perangkat ini</button>' +
+          '<div class="tombol-tumpuk"><button class="tombol tombol-primer" id="btnBanding" type="button">Bandingkan HP ini</button>' +
           '<button class="link-bersih salin-link" id="btnSalin" type="button">Salin tautan HP ini</button></div></div>' +
           '<div class="ringkasan"><div class="judul-blok">Spesifikasi utama</div>' +
           '<table class="kunci-tabel"><tbody>' +
@@ -1000,7 +977,8 @@ function favList() {
         if (!sisa || sisa.length <= 4) return r.name;
         return sisa;
       }
-      app.innerHTML = crumb([{ teks: "Beranda", href: "#/" }, { teks: COPY.perbandingan }]) +
+      app.innerHTML = '<div class="halaman-banding">' +
+        crumb([{ teks: "Beranda", href: "#/" }, { teks: COPY.perbandingan }]) +
         '<div class="pad1012"><div class="judul-blok">' + COPY.perbandingan + '</div>' +
         '<p class="hasil-info">Ketik untuk menambah (maks 3 HP). Yang berbeda dicetak tebal; garis hijau menandai pemenang tunggal kategorinya.</p>' +
         '<div class="tambah-wrap"><label for="tambahCari">' + COPY.tambahPerangkat + "</label>" +
@@ -1012,7 +990,7 @@ function favList() {
         '<button class="tombol tombol-mini" id="btnSalinBanding" type="button">' + COPY.salinTautan + "</button>" +
         '<button class="link-bersih" id="btnResetBanding" type="button">Atur ulang</button></div>' +
         iklanHTML("banding_atas") +
-        '<div id="hasilBanding" class="mt10"></div></div>';
+        '<div id="hasilBanding" class="mt10"></div></div></div>';
       /* Kolom tambah ala "Add to compare" Kimovil: satu input + dropdown maks 6
          saran (yang sudah dipilih tidak ditawarkan lagi). Pilih = masuk tray. */
       var tambahBuka = false, tambahAktif = 0;
@@ -1109,7 +1087,7 @@ function favList() {
         if (inputTambah) inputTambah.value = "";
         tutupTambah();
         syncURL(); gambarTray(); muat();
-        toast("Pilihan dikosongkan");
+        toast("Perbandingan dikosongkan");
       };
       document.getElementById("btnSalinBanding").onclick = function (e) {
         var url = location.href;
@@ -1218,7 +1196,7 @@ function favList() {
             alasan = "unggul " + skorMax + " dari 8 kategori angka";
           } else {
             var tingkat = [
-              { w: wNilai, apa: COPY.nilaiUang, ket: function (i) { return nilaiTeks(i) + " AnTuTu/Rp1 jt"; } },
+              { w: wNilai, apa: "nilai terbaik", ket: function (i) { return nilaiTeks(i) + " AnTuTu/Rp1 jt"; } },
               { w: wAntu, apa: "performa", ket: function (i) { return "AnTuTu " + Number(antuVals[i]).toLocaleString("id-ID"); } },
               { w: wHarga, apa: "harga termurah", ket: function (i) { return formatIDR(hargaVals[i]); } },
               { w: wRate, apa: "rating pengguna", ket: function (i) { return rateVals[i] + "/5"; } }
@@ -1234,10 +1212,10 @@ function favList() {
           /* Pilihan cepat: bedah per kebutuhan dari pemenang tunggal tiap
              kategori + juara nilai-uang. Pendukung vonis, bukan vonisnya. */
           var cepat = [];
-          if (wAntu >= 0) cepat.push("gaming <b>" + esc(namaPendek(rows[wAntu])) + "</b> (AnTuTu " + Number(antuVals[wAntu]).toLocaleString("id-ID") + ")");
-          if (wBat >= 0) cepat.push("baterai <b>" + esc(namaPendek(rows[wBat])) + "</b> (" + esc(batVals[wBat]) + " mAh)");
-          if (wHarga >= 0) cepat.push(COPY.anggaran + " <b>" + esc(namaPendek(rows[wHarga])) + "</b> (" + formatIDR(hargaVals[wHarga]) + ")");
-          if (wNilai >= 0) cepat.push(COPY.nilaiUang + " <b>" + esc(namaPendek(rows[wNilai])) + "</b> (" + nilaiTeks(wNilai) + " AnTuTu/Rp1 jt)");
+          if (wAntu >= 0) cepat.push("Gaming: <b>" + esc(namaPendek(rows[wAntu])) + "</b> (AnTuTu " + Number(antuVals[wAntu]).toLocaleString("id-ID") + ")");
+          if (wBat >= 0) cepat.push("Baterai: <b>" + esc(namaPendek(rows[wBat])) + "</b> (" + esc(batVals[wBat]) + " mAh)");
+          if (wHarga >= 0) cepat.push("Termurah: <b>" + esc(namaPendek(rows[wHarga])) + "</b> (" + formatIDR(hargaVals[wHarga]) + ")");
+          if (wNilai >= 0) cepat.push(COPY.nilaiUang + ": <b>" + esc(namaPendek(rows[wNilai])) + "</b> (" + nilaiTeks(wNilai) + " AnTuTu/Rp1 jt)");
           var vonisUmum;
           if (juaraUmum >= 0) {
             vonisUmum = '<b class="vonis-nama">' + esc(rows[juaraUmum].name) + "</b> " + alasan + " (" + esc(tallyTeks()) + ").";
@@ -1245,7 +1223,7 @@ function favList() {
               vonisUmum += '<span class="vonis-cepat">Pertimbangan: ' + cepat.join(" · ") + ".</span>";
             }
           } else {
-            vonisUmum = "<b>Skor identik di semua kategori.</b> Semua angka sama (" + esc(tallyTeks()) + ") - bedakan dari kamera, desain, pembaruan perangkat lunak, atau garansi.";
+            vonisUmum = "<b>Skor identik di semua kategori.</b> Semua angka sama (" + esc(tallyTeks()) + ") - bedakan dari kamera, desain, pembaruan software, atau garansi.";
           }
           /* Panel vonis ala Versus: pemenang + alasan + bilah skor.
              Detail kategori tetap ada di seksi "Ringkasan skor" tabel. */
@@ -1423,10 +1401,9 @@ function favList() {
       app.innerHTML = crumb([{ teks: "Beranda", href: "#/" }, { teks: "Berita dan panduan" }]) +
         '<div class="pad1012"><div class="judul-blok">Berita dan panduan (' + news.length + ")</div>" +
         iklanHTML("berita_atas") +
-        news.map(function (n) {
+        '<div class="berita-grid">' + news.map(function (n) {
           return '<div class="berita-baris" data-href="#/news/' + n.id + '"><div class="berita-tgl"><b>' + esc(n.tanggal.slice(8, 10)) + "</b>" + bulanTahun(n.tanggal) + '</div><div class="min0"><span class="tag">' + esc(n.kategori) + '</span> <a class="berita-judul" href="#/news/' + n.id + '">' + esc(n.judul) + '</a><div class="berita-ringkas">' + esc(n.ringkasan) + '</div><div class="mt6"><a class="link-kecil" href="#/news/' + n.id + '">Baca selengkapnya &raquo;</a></div></div></div>';
-        }).join("") + "</div>";
-      prosesIklan();
+        }).join("") + "</div></div>";      prosesIklan();
     }).catch(function (err) {
       app.innerHTML = '<div class="error-box">' + esc(err.message) + "</div>";
     });
@@ -1456,7 +1433,7 @@ function favList() {
     setJudul("Favorit");
     var ids = favList();
     if (!ids.length) {
-      app.innerHTML = crumb([{ teks: "Beranda", href: "#/" }, { teks: "Favorit" }]) + '<div class="kosong"><b>Belum ada favorit.</b><br>Tandai ikon bintang pada HP yang ingin disimpan.<br><br><a class="tombol tombol-biru" href="#/phones">Buka katalog</a></div>';
+      app.innerHTML = crumb([{ teks: "Beranda", href: "#/" }, { teks: "Favorit" }]) + '<div class="kosong"><b>Belum ada favorit.</b><br>Ketuk ikon bintang pada HP untuk menyimpannya di sini.<br><br><a class="tombol tombol-biru" href="#/phones">Buka katalog</a></div>';
       return;
     }
     app.innerHTML = '<div class="loading">Memuat favorit...</div>';
