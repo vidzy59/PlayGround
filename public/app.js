@@ -311,7 +311,7 @@ function favList() {
       '<div class="baris-spek"><b>' + esc(p.display.ukuran) + "</b>, " + esc(p.display.tipe.split(",")[0]) + " - <b>" + esc(p.platform.chipset.split("(")[0].trim()) + "</b> - <b>" + esc(p.memory.ramUtama) + "GB/" + esc(p.memory.storageUtama) + "GB</b> - " + esc(p.battery.kapasitas) + " mAh</div>" +
       '<div class="skor-kecil"><span class="rate-num' + kelasRate(r) + '">' + esc(r) + '</span> ' + bintangTeks(r) + " " + esc(countLive(p)) + " penilaian</div></div>" +
       '<div class="baris-kanan"><div class="harga-merah">' + formatIDR(h) + '</div><div class="harga-kecil">dari ' + esc(p.prices ? p.prices.length : 1) + ' toko</div>' +
-      '<div class="aksi-baris"><button class="banding-link" data-compare="' + esc(p.id) + '" type="button">+ Banding</button>' +
+      '<div class="aksi-baris"><a class="spek-link" href="#/phone/' + esc(p.id) + '">Spek →</a><button class="banding-link" data-compare="' + esc(p.id) + '" type="button">+ Banding</button>' +
       '<button class="bintang-fav' + (isFav(p.id) ? " suka" : "") + '" data-fav="' + esc(p.id) + '" type="button" title="Simpan ke favorit" aria-label="Simpan ' + esc(p.name) + ' ke favorit" aria-pressed="' + (isFav(p.id) ? "true" : "false") + '">' + (isFav(p.id) ? "★" : "☆") + "</button></div></div></div>";
   }
 
@@ -409,7 +409,8 @@ function favList() {
         if (b.classList.contains("bintang-fav")) {
           b.textContent = added ? "★" : "☆";
           b.setAttribute("aria-pressed", added ? "true" : "false");
-        } else if (b.classList.contains("fav-mini")) b.textContent = added ? "★ TERSIMPAN" : "☆ SIMPAN";
+          b.setAttribute("title", added ? "Hapus dari favorit" : "Simpan ke favorit");
+        }
       });
       toast(added ? "Tersimpan di favorit" : "Dihapus dari favorit");
       if ((location.hash || "").indexOf("#/favorites") === 0) renderFavorites();
@@ -839,16 +840,43 @@ function favList() {
           else { try { var t = document.createElement("textarea"); t.value = url; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); done(true); } catch (err) { done(false); } }
         };
         app.querySelectorAll("[data-view]").forEach(function (b) {
-          b.onclick = function () { galView = b.getAttribute("data-view"); gambarGaleri(); };
+          b.onclick = function () {
+            galView = b.getAttribute("data-view");
+            var gu = document.getElementById("galeriUtama");
+            if (gu) { gu.classList.add("ganti"); setTimeout(function () { gambarGaleri(); gu.classList.remove("ganti"); }, 90); }
+            else gambarGaleri();
+          };
         });
         app.querySelectorAll("[data-warna]").forEach(function (d) {
           d.onclick = function () {
             app.querySelectorAll("[data-warna]").forEach(function (x) { x.classList.remove("pilih"); });
             d.classList.add("pilih");
             galWarna = parseInt(d.getAttribute("data-warna"), 10);
-            gambarGaleri();
+            var gu2 = document.getElementById("galeriUtama");
+            if (gu2) { gu2.classList.add("ganti"); setTimeout(function () { gambarGaleri(); gu2.classList.remove("ganti"); }, 90); }
+            else gambarGaleri();
           };
         });
+        /* Jangkar aktif mengikuti section terlihat: user tahu posisi di spek panjang. */
+        try {
+          var jBtns = app.querySelectorAll(".jangkar [data-goto]");
+          var jMap = {};
+          jBtns.forEach(function (b) { jMap[b.getAttribute("data-goto")] = b; });
+          if ("IntersectionObserver" in window && jBtns.length) {
+            var jObs = new IntersectionObserver(function (es) {
+              es.forEach(function (en) {
+                if (en.isIntersecting && jMap[en.target.id]) {
+                  jBtns.forEach(function (x) { x.classList.remove("aktif"); });
+                  jMap[en.target.id].classList.add("aktif");
+                }
+              });
+            }, { rootMargin: "-40% 0px -55% 0px" });
+            ["bagian-spek", "bagian-harga", "bagian-nilai", "bagian-plusminus"].forEach(function (bid) {
+              var el = document.getElementById(bid);
+              if (el) jObs.observe(el);
+            });
+          }
+        } catch (e) {}
         prosesIklan();
       })
       .catch(function (err) {
@@ -1190,7 +1218,8 @@ function favList() {
               return '<div class="duel-kartu' + (isJuara ? " juara" : "") + '">' +
                 '<button class="tray-hapus" data-lepas="' + esc(r.id) + '" type="button" aria-label="Hapus ' + esc(r.name) + ' dari perbandingan">×</button>' +
                 (isJuara ? '<span class="juara-badge">PEMENANG</span>' : "") +
-                '<a href="#/phone/' + esc(r.id) + '">' + phoneArt(r, 52, 68, 0) + "<br><b>" + esc(r.name) + "</b></a>" +
+                '<a href="#/phone/' + esc(r.id) + '" aria-label="Lihat spek ' + esc(r.name) + '">' + phoneArt(r, 52, 68, 0) + "<br><b>" + esc(r.name) + "</b></a>" +
+                '<div><a class="spek-link" href="#/phone/' + esc(r.id) + '">Lihat spek →</a></div>' +
                 '<div class="skor-kecil">' + esc(r.memory.ramUtama) + "GB · " + esc(r.memory.storageUtama) + "GB</div>" +
                 '<div class="skor-kecil">' + esc(String(r.platform.chipset).split("(")[0].trim()) + " · " + esc(r.battery.kapasitas) + " mAh</div>" +
                 '<div class="harga-merah">' + formatIDR(r.hargaTermurah) + "</div></div>";

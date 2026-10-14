@@ -26,7 +26,13 @@ app.use((req, res, next) => {
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   next();
 });
-app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h", etag: true }));
+/* Aset boleh dicache 1 jam (ada ?v=3 busting); index.html JANGAN —
+   kalau ikut ke-cache, browser buka shell lama tanpa link spek baru. */
+app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h", etag: true, index: false }));
+function kirimHTML(res) {
+  res.setHeader("Cache-Control", "no-cache, must-revalidate");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+}
 
 // Favicon: 204 agar browser tidak menerima HTML sebagai ikon
 app.get("/favicon.ico", (req, res) => res.status(204).end());
@@ -236,9 +242,10 @@ app.get("/api/aff", (req, res) => { cacheDetik(res, 300); res.json(AFF || { akti
 app.get("/api/ads", (req, res) => { cacheDetik(res, 300); res.json(ADS || { aktif: false }); });
 
 // fallback SPA
+app.get("/", (req, res) => kirimHTML(res));
 app.get("*", (req, res) => {
   if (req.path.startsWith("/api/")) return res.status(404).json({ error: "Endpoint tidak ditemukan." });
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  kirimHTML(res);
 });
 
 // Body JSON rusak harus balas JSON, bukan HTML bawaan Express
