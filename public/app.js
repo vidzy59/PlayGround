@@ -311,7 +311,8 @@ function favList() {
       '<div class="baris-spek"><b>' + esc(p.display.ukuran) + "</b>, " + esc(p.display.tipe.split(",")[0]) + " - <b>" + esc(p.platform.chipset.split("(")[0].trim()) + "</b> - <b>" + esc(p.memory.ramUtama) + "GB/" + esc(p.memory.storageUtama) + "GB</b> - " + esc(p.battery.kapasitas) + " mAh</div>" +
       '<div class="skor-kecil"><span class="rate-num' + kelasRate(r) + '">' + esc(r) + '</span> ' + bintangTeks(r) + " " + esc(countLive(p)) + " penilaian</div></div>" +
       '<div class="baris-kanan"><div class="harga-merah">' + formatIDR(h) + '</div><div class="harga-kecil">dari ' + esc(p.prices ? p.prices.length : 1) + ' toko</div>' +
-      '<div class="aksi-baris"><button class="banding-link" data-compare="' + esc(p.id) + '" type="button">+ Banding</button>' +
+      '<div class="aksi-baris"><a class="lihat-link" href="#/phone/' + esc(p.id) + '">Lihat spek →</a>' +
+      '<button class="banding-link" data-compare="' + esc(p.id) + '" type="button">+ Banding</button>' +
       '<button class="bintang-fav' + (isFav(p.id) ? " suka" : "") + '" data-fav="' + esc(p.id) + '" type="button" title="Simpan ke favorit" aria-label="Simpan ' + esc(p.name) + ' ke favorit" aria-pressed="' + (isFav(p.id) ? "true" : "false") + '">' + (isFav(p.id) ? "★" : "☆") + "</button></div></div></div>";
   }
 
@@ -343,9 +344,9 @@ function favList() {
   }
   function railKananHTML(populer, turun) {
     return '<div class="blok">' + blokJudul("Paling dilihat") +
-      '<ol class="ol-pop pad68">' + populer.slice(0, 7).map(function (p, i) {
+      '<ul class="ol-pop pad68">' + populer.slice(0, 7).map(function (p, i) {
         return '<li><span class="no">' + (i + 1) + '.</span><span class="min0"><a href="#/phone/' + esc(p.id) + '">' + esc(p.name) + "</a><small>" + esc(Number(p.hits).toLocaleString("id-ID")) + " dilihat - " + formatIDR(hargaMin(p)) + "</small></span></li>";
-      }).join("") + "</ol></div>" +
+      }).join("") + "</ul></div>" +
       iklanHTML("rail", "box") +
       '<div class="blok">' + blokJudul("Harga terbaik 4 jutaan") +
       '<div class="pad68 teks12">' + turun.map(function (p) {
@@ -1162,9 +1163,9 @@ function favList() {
             var vv = rows.map(fn);
             var sama = vv.every(function (x) { return String(x) === String(vv[0]); });
             var tutup = sek && sekTutup[sek];
-            return '<div class="cmp-baris' + (sama ? " sama" : "") + (tutup ? " tutup" : "") + '"' + (sek ? ' data-sek="' + sek + '"' : "") + '><div class="cmp-label">' + esc(label) + "</div>" + rows.map(function (r, ri) {
+            return '<div class="cmp-baris' + (sama ? " sama" : "") + (tutup ? " tutup" : "") + '"' + (sek ? ' data-sek="' + sek + '"' : "") + ' role="row"><div class="cmp-label" role="rowheader">' + esc(label) + "</div>" + rows.map(function (r, ri) {
               var cls = "cmp-val" + ((wIdx === ri) ? " menang" : b ? " beda" : "") + (align === "kiri" ? " kiri" : "");
-              return '<div class="' + cls + '">' + fn(r, ri) + "</div>";
+              return '<div class="' + cls + '" role="cell">' + fn(r, ri) + "</div>";
             }).join("") + "</div>";
           }
           function seksi(judul, key, jumlah) {
@@ -1200,12 +1201,12 @@ function favList() {
              baris yang panjang, nama HP tetap terbaca sehingga mudah dibandingkan.
              Grid-nya sama persis dengan tabel agar kolom lurus; geser horizontal
              tabel disalin ke kepala ini agar nama tetap di atas kolomnya. */
-          var kepala = '<div class="cmp-sticky"><div class="cmp-sticky-grid" id="cmpStickyGrid" style="--n:' + rows.length + '">' +
-            '<div class="cmp-head-label" id="cmpHeadLabel">Model</div>' +
+          var kepala = '<div class="cmp-sticky"><div class="cmp-sticky-grid" id="cmpStickyGrid" style="--n:' + rows.length + '" role="row">' +
+            '<div class="cmp-head-label" id="cmpHeadLabel" role="columnheader">Model</div>' +
             rows.map(function (r) {
-              return '<div class="cmp-head-val"><b>' + esc(namaPendek(r)) + "</b><br><small>" + esc(r.memory.ramUtama) + "GB · " + esc(r.memory.storageUtama) + "GB</small></div>";
+              return '<div class="cmp-head-val" role="columnheader"><b>' + esc(namaPendek(r)) + "</b><br><small>" + esc(r.memory.ramUtama) + "GB · " + esc(r.memory.storageUtama) + "GB</small></div>";
             }).join("") + "</div></div>";
-          box.innerHTML = duelHead() + vonisBar + kepala + '<div class="scroll-x" id="cmpScroll"><div class="cmp" style="--n:' + rows.length + '">' +
+          box.innerHTML = duelHead() + vonisBar + kepala + '<div class="scroll-x" id="cmpScroll"><div class="cmp" style="--n:' + rows.length + '" role="table" aria-label="Perbandingan spesifikasi HP">' +
             /* Ringkasan skor di seksi pertama (pola Kimovil): baca pemenang tiap
                kategori tanpa menggulir ke bawah; detailnya di seksi masing-masing. */
             seksi("Ringkasan skor", "skor", 8) +
@@ -1263,8 +1264,8 @@ function favList() {
             seksi("Harga dan pembelian", "beli", 2) +
             brs("Toko termurah", function (r) { return esc(tokoMin(r)); }, -1, "kiri", "beli") +
             brs("Beli", function (r) { return tombolBeli(tokoMin(r), r.name, true); }, -1, "", "beli") +
-            '<div class="cmp-baris cmp-kaki"><div class="cmp-label">Model</div>' + rows.map(function (r) {
-              return '<div class="cmp-val"><a href="#/phone/' + esc(r.id) + '"><b>' + esc(namaPendek(r)) + "</b></a><br><span class=\"harga-merah\">" + formatIDR(r.hargaTermurah) + "</span></div>";
+            '<div class="cmp-baris cmp-kaki" role="row"><div class="cmp-label" role="rowheader">Model</div>' + rows.map(function (r) {
+              return '<div class="cmp-val" role="cell"><a href="#/phone/' + esc(r.id) + '"><b>' + esc(namaPendek(r)) + "</b></a><br><span class=\"harga-merah\">" + formatIDR(r.hargaTermurah) + "</span></div>";
             }).join("") + "</div>" +
             "</div></div>" +
             '<p class="hasil-info">Nilai yang berbeda dicetak tebal; garis hijau menandai pemenang tunggal di kategorinya. Klik judul seksi untuk melipat atau membuka. Centang "Sembunyikan yang sama" untuk fokus ke perbedaan saja. Kamera, OS, ketahanan air, dan berat tidak diperingkat karena angka terbesar belum tentu yang terbaik.</p>';

@@ -26,7 +26,7 @@ app.use((req, res, next) => {
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   next();
 });
-app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h", etag: true }));
+app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h", etag: true, index: false }));
 
 // Favicon: 204 agar browser tidak menerima HTML sebagai ikon
 app.get("/favicon.ico", (req, res) => res.status(204).end());
@@ -235,9 +235,10 @@ app.get("/api/news/:id", (req, res) => {
 app.get("/api/aff", (req, res) => { cacheDetik(res, 300); res.json(AFF || { aktif: false }); });
 app.get("/api/ads", (req, res) => { cacheDetik(res, 300); res.json(ADS || { aktif: false }); });
 
-// fallback SPA
+// fallback SPA: index.html jangan dicache lama agar rilis baru langsung tampil
 app.get("*", (req, res) => {
   if (req.path.startsWith("/api/")) return res.status(404).json({ error: "Endpoint tidak ditemukan." });
+  noCache(res);
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
