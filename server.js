@@ -3,9 +3,20 @@ const cors = require("cors");
 const path = require("path");
 const { PHONES, NEWS, AFF, ADS } = require("./data");
 
+/* Arsitektur berlapis: Konfigurasi > Middleware (jejak + pengaman) >
+   Validasi > Toko data (indeks) > Presenter > Rute > Penanganan galat.
+   Satu file agar deploy tetap sederhana, tiap lapis punya batas tegas. */
 const app = express();
 app.disable("x-powered-by");
 const PORT = process.env.PORT || 3000;
+
+/* Jejak permintaan ringan: ID unik per respons untuk lacak log/proxy. */
+let reqSeq = 0;
+app.use((req, res, next) => {
+  reqSeq += 1;
+  res.setHeader("X-Request-Id", "sp" + Date.now().toString(36) + "-" + reqSeq);
+  next();
+});
 
 app.use(cors());
 app.use(express.json({ limit: "256kb" }));
@@ -64,6 +75,25 @@ function minPrice(p) {
 function escapeReg(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 function isId(s) { return /^[a-z0-9-]{3,60}$/.test(String(s || "")); }
 function cleanSearch(s) { return String(s || "").trim().slice(0, 80); }
+function kirimGalat(res, kode, pesan) { return res.status(kode).json({ error: pesan, code: kode }); }
+/* Toko data berindeks: cari ID O(1), daftar merek dihitung sekali.
+   Dataset kecil (24 HP) tapi pola ini siap saat katalog membesar. */
+const TokoHP = {
+  byId: new Map(PHONES.map((p) => [p.id, p])),
+  daftarMerek: null,
+  merek() {
+    if (!this.daftarMerek) {
+      const map = {};
+      PHONES.forEach((p) => { map[p.brand] = (map[p.brand] || 0) + 1; });
+      this.daftarMerek = Object.entries(map)
+        .map(([brand, count]) => ({ brand, count }))
+        .sort((a, b) => a.brand.localeCompare(b.brand));
+    }
+    return this.daftarMerek;
+  },
+  ambil(id) { return this.byId.get(id) || null; },
+  adaMerek(b) { return this.merek().some((m) => m.brand === b); }
+};
 /* Daftar ringkas: untuk tray compare, autocomplete, dan baris daftar.
    Full object ~4KB/HP (pros/cons/detail/sensor); ringkas ~1KB.
    24 HP = hemat ~70KB per muat compare. Detail/similar/compare tetap full. */
@@ -97,9 +127,7 @@ app.get("/api/stats", (req, res) => {
 
 app.get("/api/brands", (req, res) => {
   cacheDetik(res, 300);
-  const map = {};
-  PHONES.forEach((p) => { map[p.brand] = (map[p.brand] || 0) + 1; });
-  res.json(Object.entries(map).map(([brand, count]) => ({ brand, count })).sort((a, b) => a.brand.localeCompare(b.brand)));
+  res.json(TokoHP.merek());
 });
 
 app.get("/api/phones", (req, res) => {
@@ -115,14 +143,17 @@ app.get("/api/phones", (req, res) => {
     // Validasi angka: tolak negatif/gila agar filter tak menghasilkan kosong misterius
     if ((minP !== null && (Number.isNaN(minP) || minP < 0 || minP > 999999999)) ||
         (maxP !== null && (Number.isNaN(maxP) || maxP < 0 || maxP > 999999999))) {
-      return res.status(400).json({ error: "Rentang harga tidak valid." });
+      return kirimGalat(res, 400, "Rentang harga tidak valid.");
     }
     if (minP !== null && maxP !== null && minP > maxP) {
-      return res.status(400).json({ error: "Harga min lebih besar dari maks." });
+      return kirimGalat(res, 400, "Harga minimum lebih besar dari maksimum.");
     }
     if ((ram !== null && (Number.isNaN(ram) || ram < 0 || ram > 64)) ||
         (storage !== null && (Number.isNaN(storage) || storage < 0 || storage > 2048))) {
-      return res.status(400).json({ error: "Filter memori tidak valid." });
+      return kirimGalat(res, 400, "Filter memori tidak valid.");
+    }
+    if (brand && brand !== "Semua" && !TokoHP.adaMerek(brand)) {
+      return kirimGalat(res, 400, "Merek tidak dikenal.");
     }
     const ringkas = req.query.ringkas === "1" || req.query.ringkas === "true";
     const only5G = req.query.only5G === "1" || req.query.only5G === "true";
@@ -176,18 +207,18 @@ app.get("/api/phones", (req, res) => {
 });
 
 app.get("/api/phones/:id", (req, res) => {
-  if (!isId(req.params.id)) return res.status(400).json({ error: "ID HP tidak valid." });
-  const p = PHONES.find((x) => x.id === req.params.id);
-  if (!p) return res.status(404).json({ error: "HP tidak ditemukan." });
+  if (!isId(req.params.id)) return kirimGalat(res, 400, "ID perangkat tidak valid.");
+  const p = TokoHP.ambil(req.params.id);
+  if (!p) return kirimGalat(res, 404, "Perangkat tidak ditemukan.");
   cacheDetik(res, 30);
   const full = withRating(p);
   res.json({ ...full, hargaTermurah: minPrice(p) });
 });
 
 app.get("/api/phones/:id/similar", (req, res) => {
-  if (!isId(req.params.id)) return res.status(400).json({ error: "ID HP tidak valid." });
-  const p = PHONES.find((x) => x.id === req.params.id);
-  if (!p) return res.status(404).json({ error: "HP tidak ditemukan." });
+  if (!isId(req.params.id)) return kirimGalat(res, 400, "ID perangkat tidak valid.");
+  const p = TokoHP.ambil(req.params.id);
+  if (!p) return kirimGalat(res, 404, "Perangkat tidak ditemukan.");
   cacheDetik(res, 60);
   const low = minPrice(p);
   const scored = PHONES.filter((x) => x.id !== p.id).map((x) => {
@@ -206,15 +237,16 @@ app.get("/api/phones/:id/similar", (req, res) => {
 app.get("/api/compare", (req, res) => {
   /* Batas 12: halaman favorit memakai endpoint ini untuk menampilkan semua favorit,
      sedangkan UI perbandingan membatasi 3 HP di sisi frontend. */
-  const ids = (req.query.ids || "").toString().split(",").map((s) => s.trim()).filter(Boolean).slice(0, 12);
-  if (!ids.length) return res.status(400).json({ error: "Pilih minimal 1 HP." });
+  const mentah = (req.query.ids || "").toString().split(",").map((s) => s.trim()).filter(Boolean);
+  const ids = [...new Set(mentah)].slice(0, 12);
+  if (!ids.length) return kirimGalat(res, 400, "Pilih minimal 1 perangkat.");
   for (const id of ids) {
-    if (!isId(id)) return res.status(400).json({ error: "ID tidak valid: " + id });
+    if (!isId(id)) return kirimGalat(res, 400, "ID tidak valid: " + id);
   }
   const result = [];
   for (const id of ids) {
-    const p = PHONES.find((x) => x.id === id);
-    if (!p) return res.status(404).json({ error: "ID tidak valid: " + id });
+    const p = TokoHP.ambil(id);
+    if (!p) return kirimGalat(res, 404, "ID tidak valid: " + id);
     result.push({ ...withRating(p), hargaTermurah: minPrice(p) });
   }
   cacheDetik(res, 30);
@@ -237,16 +269,24 @@ app.get("/api/ads", (req, res) => { cacheDetik(res, 300); res.json(ADS || { akti
 
 // fallback SPA
 app.get("*", (req, res) => {
-  if (req.path.startsWith("/api/")) return res.status(404).json({ error: "Endpoint tidak ditemukan." });
+  if (req.path.startsWith("/api/")) return kirimGalat(res, 404, "Endpoint tidak ditemukan.");
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Body JSON rusak harus balas JSON, bukan HTML bawaan Express
 app.use((err, req, res, next) => {
   if (err && (err.type === "entity.parse.failed" || err.status === 400)) {
-    return res.status(400).json({ error: "Format data tidak valid." });
+    return kirimGalat(res, 400, "Format data tidak valid.");
   }
   next(err);
+});
+
+// Penjaga terakhir: galat tak terduga selalu JSON konsisten, bukan HTML
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error("[" + res.getHeader("X-Request-Id") + "]", err && err.stack ? err.stack : err);
+  if (res.headersSent) return;
+  kirimGalat(res, 500, "Terjadi gangguan server.");
 });
 
 if (require.main === module) {
