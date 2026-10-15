@@ -20,6 +20,22 @@ app.use((req, res, next) => {
 
 app.use(cors());
 app.use(express.json({ limit: "256kb" }));
+/* Rate-limit ringan khusus API: 180 req/menit per IP (fixed window in-memory).
+   Untuk apa: mencegah autocomplete + compare membanjiri server saat user mengetik cepat. */
+var rlMap = new Map();
+app.use("/api/", function (req, res, next) {
+  var ip = (req.ip || req.connection.remoteAddress || "x").toString().slice(0, 64);
+  var now = Date.now(), slot = Math.floor(now / 60000);
+  var rec = rlMap.get(ip);
+  if (!rec || rec.slot !== slot) { rec = { slot: slot, n: 0 }; rlMap.set(ip, rec); }
+  rec.n += 1;
+  if (rlMap.size > 2000) rlMap.clear();
+  if (rec.n > 180) {
+    res.setHeader("Retry-After", "60");
+    return res.status(429).json({ error: "Terlalu banyak permintaan, coba lagi sebentar.", code: 429 });
+  }
+  next();
+});
 /* Cache API pendek (bukan no-store total): harga berubah hitungan jam,
    bukan detik. Daftar/brand boleh dicache 60 dtk, detail 30 dtk —
    hemat bandwidth dan render lebih cepat tanpa harga basi. */
@@ -148,9 +164,18 @@ app.get("/api/phones", (req, res) => {
     if (minP !== null && maxP !== null && minP > maxP) {
       return kirimGalat(res, 400, "Harga minimum lebih besar dari maksimum.");
     }
+    const minBat = req.query.minBattery ? Number(req.query.minBattery) : null;
+    const sort = (req.query.sort || "populer").toString();
     if ((ram !== null && (Number.isNaN(ram) || ram < 0 || ram > 64)) ||
         (storage !== null && (Number.isNaN(storage) || storage < 0 || storage > 2048))) {
       return kirimGalat(res, 400, "Filter memori tidak valid.");
+    }
+    if (minBat !== null && !Number.isNaN(minBat) && (minBat < 0 || minBat > 30000)) {
+      return kirimGalat(res, 400, "Filter baterai tidak valid.");
+    }
+    var sortAllow = ["populer", "terbaru", "termurah", "termahal", "nilai", "rating", "nama"];
+    if (sortAllow.indexOf(sort) === -1) {
+      return kirimGalat(res, 400, "Urutkan tidak dikenal.");
     }
     if (brand && brand !== "Semua" && !TokoHP.adaMerek(brand)) {
       return kirimGalat(res, 400, "Merek tidak dikenal.");
@@ -159,11 +184,9 @@ app.get("/api/phones", (req, res) => {
     const only5G = req.query.only5G === "1" || req.query.only5G === "true";
     // Filter baru: baterai minimal (mAh) dan NFC. Untuk apa: baterai = daya tahan,
     // NFC = e-money/TapCash yang krusial di Indonesia. Ditaruh di finder + katalog.
-    const minBat = req.query.minBattery ? Number(req.query.minBattery) : null;
     const onlyNFC = req.query.onlyNFC === "1" || req.query.onlyNFC === "true";
     // Wireless charging membedakan flagship + Note 40 Pro dari mayoritas (6 dari 24).
     const onlyWireless = req.query.onlyWireless === "1" || req.query.onlyWireless === "true";
-    const sort = (req.query.sort || "populer").toString();
 
     if (q) {
       const re = new RegExp(escapeReg(q), "i");

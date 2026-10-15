@@ -396,6 +396,7 @@ function favList() {
       '<label>Baterai min</label><select id="fBat"><option value="">Semua</option>' +
       [[4000, "4000 mAh+"], [4500, "4500 mAh+"], [5000, "5000 mAh+"]].map(function (o) { return '<option value="' + o[0] + '"' + (String(state.minBattery || "") === String(o[0]) ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select>" +
       '<label class="finder-cek polos"><input type="checkbox" id="f5g" class="cekbox"' + (state.only5G ? " checked" : "") + "> Hanya 5G</label>" +
+      '<label class="finder-cek polos"><input type="checkbox" id="fNfc" class="cekbox"' + (state.onlyNFC ? " checked" : "") + "> Ada NFC</label>" +
       '<label class="finder-cek polos"><input type="checkbox" id="fWls" class="cekbox"' + (state.onlyWireless ? " checked" : "") + "> Ada wireless charging</label>" +
       '<button class="tombol tombol-primer tombol" id="fTerapkan" type="button">Terapkan</button>' +
       (compact ? "" : '<button class="tombol tombol-blok" id="fReset" type="button">' + COPY.aturUlang + "</button>") +
@@ -582,6 +583,7 @@ function favList() {
       var brands = res[0], populer = res[1], terbaru = res[2], news = res[3];
       var murah = populer.data.filter(function (p) { return hargaMin(p) < 5000000; }).slice(0, 4);
       var turun = murah.length ? murah : populer.data.slice(0, 4);
+      var totalHP = populer.total || populer.data.length;
       app.innerHTML =
         '<div class="kolom-home"><aside class="rail-kiri rail-nempel" id="finderHome">' + finderHTML(brands, {}, true) +
         '<div class="mt10">' + blokJudul("Merek") + '<div class="merek-box">' +
@@ -590,23 +592,29 @@ function favList() {
         }).join("") + "</div></div></aside>" +
         '<div class="badan">' +
         '<button class="tombol tombol-mini filter-toggle" id="filterToggle" type="button" aria-expanded="false" aria-controls="finderHome">Filter</button>' +
-        '<div class="blok">' + blokJudul("HP terbaru", "Indeks lengkap", "#/phones?sort=terbaru") +
-        terbaru.data.map(barisHP).join("") + "</div>" +
-        '<div class="blok">' + blokJudul("HP terpopuler", "Semua populer", "#/phones?sort=populer") +
-        populer.data.slice(0, 6).map(barisHP).join("") + "</div>" +
+        '<section class="hero"><p class="hero-kicker">Referensi HP Indonesia - harga Rupiah, spek lengkap</p>' +
+        '<h1>Bandingkan spesifikasi dan harga HP sebelum membeli</h1>' +
+        '<p class="hero-sub">' + esc(totalHP) + ' tipe HP dari ' + esc(brands.length) + ' merek, ' + esc(news.length) + ' panduan pembelian, dan perbandingan head-to-head dengan pemenang tiap kategori.</p>' +
+        '<div class="hero-aksi"><a class="tombol tombol-primer" href="#/phones">Buka katalog HP</a>' +
+        '<a class="tombol" href="#/compare">Bandingkan HP</a></div>' +
+        '<div class="hero-meta"><span><b>' + esc(totalHP) + '</b> tipe HP</span><span><b>' + esc(brands.length) + '</b> merek</span><span><b>' + esc(news.length) + '</b> panduan</span><span>Harga <b>IDR</b></span></div></section>' +
         // Pintasan budget: untuk apa: mayoritas pembeli Indonesia mulai dari budget, bukan merek.
-        '<div class="blok">' + blokJudul("Cari berdasarkan harga") +
+        '<div class="blok">' + blokJudul("Cari berdasarkan budget") +
         '<div class="budget-grid">' +
         '<a href="#/phones?maxPrice=2000000"><b>Di bawah 2 jt</b><span>HP kedua dan pelajar</span></a>' +
         '<a href="#/phones?maxPrice=3500000"><b>Di bawah 3,5 jt</b><span>NFC dan 90Hz+ paling laris</span></a>' +
         '<a href="#/phones?maxPrice=6000000"><b>Di bawah 6 jt</b><span>Gaming dan kamera OIS</span></a>' +
         '<a href="#/phones?minPrice=10000000"><b>Flagship 10 jt+</b><span>200MP, titanium, ProRes</span></a>' +
         "</div></div>" +
-        '<div class="blok">' + blokJudul(COPY.duel) +
-        '<div class="pad8 teks125">' +
-        '<div class="baris-titik"><a href="#/compare?ids=poco-x6-pro,xiaomi-redmi-note-13-pro"><b>POCO X6 Pro vs Redmi Note 13 Pro 5G</b></a> <span class="harga-kecil">- Beda Rp 500 ribu, beda kelas performa</span></div>' +
-        '<div class="baris-titik"><a href="#/compare?ids=samsung-galaxy-s24-ultra,iphone-15-pro-max"><b>Galaxy S24 Ultra vs iPhone 15 Pro Max</b></a> <span class="harga-kecil">- Duel flagship 200MP vs 48MP</span></div>' +
-        '<div class="baris-padat"><a href="#/compare?ids=infinix-note-40-pro,samsung-galaxy-a54"><b>Infinix Note 40 Pro vs Galaxy A54</b></a> <span class="harga-kecil">- 3 jutaan wireless charging vs IP67</span></div>' +
+        '<div class="blok">' + blokJudul("HP terbaru", "Indeks lengkap", "#/phones?sort=terbaru") +
+        terbaru.data.map(barisHP).join("") + "</div>" +
+        '<div class="blok">' + blokJudul("HP terpopuler", "Semua populer", "#/phones?sort=populer") +
+        populer.data.slice(0, 6).map(barisHP).join("") + "</div>" +
+        '<div class="blok">' + blokJudul(COPY.duel, "Buka perbandingan", "#/compare") +
+        '<div class="duel-grid">' +
+        '<a class="duel-item" href="#/compare?ids=poco-x6-pro,xiaomi-redmi-note-13-pro"><b>POCO X6 Pro vs Redmi Note 13 Pro 5G</b><span>Beda Rp 500 ribu, beda kelas performa</span><i>Lihat hasil &rsaquo;</i></a>' +
+        '<a class="duel-item" href="#/compare?ids=samsung-galaxy-s24-ultra,iphone-15-pro-max"><b>Galaxy S24 Ultra vs iPhone 15 Pro Max</b><span>Duel flagship 200MP vs 48MP</span><i>Lihat hasil &rsaquo;</i></a>' +
+        '<a class="duel-item" href="#/compare?ids=infinix-note-40-pro,samsung-galaxy-a54"><b>Infinix Note 40 Pro vs Galaxy A54</b><span>3 jutaan wireless charging vs IP67</span><i>Lihat hasil &rsaquo;</i></a>' +
         "</div></div>" +
         iklanHTML("home_feed") +
         '<div class="dua-isi">' +
@@ -632,6 +640,7 @@ function favList() {
       storage: (document.getElementById("fStorage") || { value: "" }).value,
       minBattery: (document.getElementById("fBat") || { value: "" }).value,
       only5G: !!(document.getElementById("f5g") || { checked: false }).checked,
+      onlyNFC: !!(document.getElementById("fNfc") || { checked: false }).checked,
       onlyWireless: !!(document.getElementById("fWls") || { checked: false }).checked
     };
   }
@@ -647,6 +656,7 @@ function favList() {
       if (s.storage) p.push("storage=" + encodeURIComponent(s.storage));
       if (s.minBattery) p.push("minBattery=" + encodeURIComponent(s.minBattery));
       if (s.only5G) p.push("only5G=1");
+      if (s.onlyNFC) p.push("onlyNFC=1");
       if (s.onlyWireless) p.push("onlyWireless=1");
       location.hash = "#/phones" + (p.length ? "?" + p.join("&") : "");
     };
@@ -678,12 +688,12 @@ function favList() {
       search: q.search || "", brand: q.brand || "Semua", minPrice: q.minPrice || "",
       maxPrice: q.maxPrice || "", ram: q.ram || "", storage: q.storage || "",
       minBattery: q.minBattery || "", onlyWireless: q.onlyWireless === "1",
-      sort: q.sort || "populer", page: parseInt(q.page || "1", 10) || 1, only5G: q.only5G === "1", limit: 8
+      sort: q.sort || "populer", page: parseInt(q.page || "1", 10) || 1, only5G: q.only5G === "1", onlyNFC: q.onlyNFC === "1", limit: 8
     };
     app.innerHTML = '<div class="loading">Memuat katalog...</div>';
     Promise.all([PhoneService.merek()]).then(function (r) {
       var brands = r[0];
-      var adaFilter = state.search || state.brand !== "Semua" || state.minPrice || state.maxPrice || state.ram || state.storage || state.only5G || state.minBattery || state.onlyWireless;
+      var adaFilter = state.search || state.brand !== "Semua" || state.minPrice || state.maxPrice || state.ram || state.storage || state.only5G || state.onlyNFC || state.minBattery || state.onlyWireless;
       var judulKatalog = adaFilter ? COPY.hasil : COPY.semuaPerangkat;
       // Chip filter aktif: untuk apa: user tahu apa yang menyaring + hapus per item tanpa reset semua.
       function chipFilter() {
@@ -696,6 +706,7 @@ function favList() {
         if (state.storage) c.push({ k: "storage", t: "Memori " + state.storage + "GB+" });
         if (state.minBattery) c.push({ k: "minBattery", t: "Baterai " + state.minBattery + "mAh+" });
         if (state.only5G) c.push({ k: "only5G", t: "5G" });
+        if (state.onlyNFC) c.push({ k: "onlyNFC", t: "NFC" });
         if (state.onlyWireless) c.push({ k: "onlyWireless", t: "Wireless charging" });
         if (!c.length) return "";
         return '<div class="chip-wrap">' + c.map(function (x) {
@@ -740,6 +751,7 @@ function favList() {
         if (state.minBattery) p.push("minBattery=" + encodeURIComponent(state.minBattery));
         if (state.sort !== "populer") p.push("sort=" + encodeURIComponent(state.sort));
         if (state.only5G) p.push("only5G=1");
+        if (state.onlyNFC) p.push("onlyNFC=1");
         if (state.onlyWireless) p.push("onlyWireless=1");
         if (state.page > 1) p.push("page=" + state.page);
         var target = "#/phones" + (p.length ? "?" + p.join("&") : "");
@@ -751,7 +763,7 @@ function favList() {
         state.search = s.search; state.brand = s.brand; state.minPrice = s.minPrice;
         state.maxPrice = s.maxPrice; state.ram = s.ram; state.storage = s.storage;
         state.minBattery = s.minBattery; state.onlyWireless = s.onlyWireless;
-        state.only5G = s.only5G; state.page = 1;
+        state.only5G = s.only5G; state.onlyNFC = s.onlyNFC; state.page = 1;
         if (!dorongHash()) { document.getElementById("chipBox").innerHTML = chipFilter(); ikatChip(); muat(); }
       };
       function ikatChip() {
@@ -768,6 +780,7 @@ function favList() {
             if (k === "storage") state.storage = "";
             if (k === "minBattery") state.minBattery = "";
             if (k === "only5G") state.only5G = false;
+            if (k === "onlyNFC") state.onlyNFC = false;
             if (k === "onlyWireless") state.onlyWireless = false;
             state.page = 1;
             if (!dorongHash()) { document.getElementById("chipBox").innerHTML = chipFilter(); ikatChip(); muat(); }
@@ -786,6 +799,7 @@ function favList() {
         if (state.storage) p.push("storage=" + encodeURIComponent(state.storage));
         if (state.minBattery) p.push("minBattery=" + encodeURIComponent(state.minBattery));
         if (state.only5G) p.push("only5G=1");
+        if (state.onlyNFC) p.push("onlyNFC=1");
         if (state.onlyWireless) p.push("onlyWireless=1");
         document.getElementById("hasilHP").innerHTML = '<div class="loading">Memuat hasil...</div>';
         PhoneService.daftar(Object.fromEntries(p.map(function (kv) {
