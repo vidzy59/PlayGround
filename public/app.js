@@ -1246,7 +1246,7 @@ function favList() {
             var sama = vv.every(function (x) { return String(x) === String(vv[0]); });
             var tutup = sek && sekTutup[sek];
             return '<div class="cmp-baris' + (sama ? " sama" : "") + (tutup ? " tutup" : "") + '"' + (sek ? ' data-sek="' + sek + '"' : "") + '><div class="cmp-label">' + esc(label) + "</div>" + rows.map(function (r, ri) {
-              var cls = "cmp-val" + ((wIdx === ri) ? " menang" : b ? " beda" : "") + (align === "kiri" ? " kiri" : "");
+              var cls = "cmp-val k" + ri + ((wIdx === ri) ? " menang" : b ? " beda" : "") + (align === "kiri" ? " kiri" : "");
               return '<div class="' + cls + '">' + fn(r, ri) + "</div>";
             }).join("") + "</div>";
           }
@@ -1283,12 +1283,12 @@ function favList() {
              baris yang panjang, nama HP tetap terbaca sehingga mudah dibandingkan.
              Grid-nya sama persis dengan tabel agar kolom lurus; geser horizontal
              tabel disalin ke kepala ini agar nama tetap di atas kolomnya. */
-          var kepala = '<div class="cmp-sticky"><div class="cmp-sticky-grid" id="cmpStickyGrid" style="--n:' + rows.length + '">' +
+          var kepala = '<div class="cmp-sticky"><div class="cmp-sticky-grid juara-' + juaraUmum + '" id="cmpStickyGrid" style="--n:' + rows.length + '">' +
             '<div class="cmp-head-label" id="cmpHeadLabel">Model</div>' +
             rows.map(function (r) {
               return '<div class="cmp-head-val"><b>' + esc(namaPendek(r)) + "</b><br><small>" + esc(r.memory.ramUtama) + "GB · " + esc(r.memory.storageUtama) + "GB</small></div>";
             }).join("") + "</div></div>";
-          box.innerHTML = duelHead() + vonisBar + kepala + '<div class="scroll-x" id="cmpScroll"><div class="cmp" style="--n:' + rows.length + '">' +
+          box.innerHTML = duelHead() + vonisBar + kepala + '<div class="scroll-x" id="cmpScroll"><div class="cmp juara-' + juaraUmum + '" style="--n:' + rows.length + '">' +
             /* Ringkasan skor di seksi pertama (pola Kimovil): baca pemenang tiap
                kategori tanpa menggulir ke bawah; detailnya di seksi masing-masing. */
             seksi("Ringkasan skor", "skor", 8) +
@@ -1346,11 +1346,11 @@ function favList() {
             seksi("Harga dan pembelian", "beli", 2) +
             brs("Toko termurah", function (r) { return esc(tokoMin(r)); }, -1, "kiri", "beli") +
             brs("Beli", function (r) { return tombolBeli(tokoMin(r), r.name, true); }, -1, "", "beli") +
-            '<div class="cmp-baris cmp-kaki"><div class="cmp-label">Model</div>' + rows.map(function (r) {
-              return '<div class="cmp-val"><a href="#/phone/' + esc(r.id) + '"><b>' + esc(namaPendek(r)) + "</b></a><br><span class=\"harga-merah\">" + formatIDR(r.hargaTermurah) + "</span></div>";
+            '<div class="cmp-baris cmp-kaki"><div class="cmp-label">Model</div>' + rows.map(function (r, ri) {
+              return '<div class="cmp-val k' + ri + '"><a href="#/phone/' + esc(r.id) + '"><b>' + esc(namaPendek(r)) + "</b></a><br><span class=\"harga-merah\">" + formatIDR(r.hargaTermurah) + "</span></div>";
             }).join("") + "</div>" +
             "</div></div>" +
-            '<p class="hasil-info">Nilai yang berbeda dicetak tebal; garis hijau menandai pemenang tunggal di kategorinya. Klik judul seksi untuk melipat atau membuka. Centang "Sembunyikan yang sama" untuk fokus ke perbedaan saja. Kamera, OS, ketahanan air, dan berat tidak diperingkat karena angka terbesar belum tentu yang terbaik.</p>';
+            '<p class="hasil-info">Nilai yang berbeda dicetak tebal; garis hijau menandai pemenang tunggal di kategorinya; kolom juara umum berlatar hijau muda. Klik judul seksi untuk melipat atau membuka. Centang "Sembunyikan yang sama" untuk fokus ke perbedaan saja. Kamera, OS, ketahanan air, dan berat tidak diperingkat karena angka terbesar belum tentu yang terbaik.</p>';
           /* Geser horizontal tabel disalin ke kepala sticky: nama model tetap
              lurus di atas kolomnya. Kolom label dikunci agar tetap di kiri. */
           var scGulir = document.getElementById("cmpScroll");
