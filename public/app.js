@@ -483,8 +483,16 @@ function favList() {
     app.innerHTML = '<div class="kosong"><h3>Halaman tidak ditemukan</h3><p><a href="#/">Kembali ke beranda</a></p></div>';
   }
   window.addEventListener("hashchange", route);
+  /* Tutup panel saran pada pointerdown-capture (SEBELUM target klik dihitung):
+     panel tambah/compare + autocomplete global posisinya mengambang dan bisa
+     menutupi tombol di bawahnya. Kalau ditutup saat bubble-click, klik pertama
+     user malah jatuh ke panel, bukan ke tombol yang dituju. */
+  document.addEventListener("pointerdown", function (e) {
+    if (!e.target.closest(".tambah-wrap") && window.__tutupPanel) window.__tutupPanel();
+    if (!e.target.closest(".searchbar")) autoBox.classList.remove("tampil");
+  }, true);
   document.addEventListener("click", function (e) {
-    /* Klik di luar kolom tambah menutup panel saran (tanpa ini panel mengambang). */
+    /* Pengaman lapis kedua untuk navigasi keyboard/sentuh. */
     if (!e.target.closest(".tambah-wrap") && window.__tutupPanel) window.__tutupPanel();
     /* Gulir dalam halaman TANPA mengubah hash: href="#bagian-x" menabrak router
        dan melempar user ke "Halaman tidak ditemukan". Tombol ini solusinya. */
@@ -1076,15 +1084,20 @@ function favList() {
   function renderCompare(query) {
     setNav("compare");
     setJudul("Perbandingan HP");
-    var ids = (query.ids || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 3);
+    var mentah = (query.ids || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+    /* Duplikat di URL (ids=a,a) = bandingkan HP dengan dirinya: buang diam-diam. */
+    mentah = mentah.filter(function (id, i) { return mentah.indexOf(id) === i; });
+    var ids = mentah.slice(0, 3);
     app.innerHTML = '<div class="loading">Memuat perbandingan...</div>';
     PhoneService.daftar({ limit: 24, sort: "nama", ringkas: 1 }).then(function (semua) {
       var semuaHP = semua.data;
       var byId = {};
       semuaHP.forEach(function (x) { byId[x.id] = x; });
+      /* ID tak dikenal jangan hilang misterius: beri tahu user sekali. */
+      var tidakDikenal = ids.filter(function (id) { return !byId[id]; });
       ids = ids.filter(function (id) { return byId[id]; }).slice(0, 3);
-      /* Duplikat di URL (ids=a,a) = bandingkan HP dengan dirinya: buang diam-diam. */
-      ids = ids.filter(function (id, i) { return ids.indexOf(id) === i; });
+      if (tidakDikenal.length) toast("ID tak dikenal diabaikan: " + tidakDikenal.join(", "));
+      if (mentah.length > 3) toast("Maksimal 3 HP — kelebihan diabaikan");
       /* Halaman dibuka kosong: tidak ada produk terpilih sampai user memilih.
          Duel populer tersedia sebagai tombol di bawah, bukan pilihan paksa. */
       /* Sorot beda aktif bawaan: beda adalah inti perbandingan. sorot=0 mematikan. */
@@ -1150,13 +1163,23 @@ function favList() {
       function gambarTambah() {
         var box = document.getElementById("tambahDaftar");
         if (!box) return;
+        /* Tray penuh: jangan tawarkan tambah yang pasti ditolak. */
+        if (ids.length >= 3) {
+          box.innerHTML = '<div class="kosong kosong-polos">Sudah 3 HP — hapus satu dulu (tombol × di kartu) untuk mengganti.</div>';
+          box.querySelectorAll("[data-item]").forEach(function () {});
+          return;
+        }
         var hasil = cocokTambah();
         if (tambahAktif >= hasil.length) tambahAktif = 0;
         box.innerHTML = hasil.length ? hasil.map(function (x, n) {
           return '<button class="slot-item' + (n === tambahAktif ? " aktif" : "") + '" data-item="' + esc(x.id) + '" type="button" role="option">' + phoneArt(x, 30, 40, 0) + '<span class="min0"><b>' + esc(x.name) + "</b><br><small>" + esc(x.platform.chipset.split("(")[0]) + " - " + esc(x.memory.ramUtama) + "GB</small></span>" + '<span class="ac-harga">' + formatIDR(hargaMin(x)) + "</span></button>";
         }).join("") : '<div class="kosong kosong-polos">Tidak ada HP yang cocok — coba kata kunci lain.</div>';
+        /* Pilih via mousedown + preventDefault (pola autocomplete baku):
+           klik biasa kalah dengan blur — input blur menutup panel sebelum
+           event click sampai ke saran. mousedown jalan lebih dulu. */
         box.querySelectorAll("[data-item]").forEach(function (b) {
-          b.onclick = function (ev) {
+          b.onmousedown = function (ev) {
+            ev.preventDefault();
             ev.stopPropagation();
             tambahHP(b.getAttribute("data-item"));
           };
@@ -1185,18 +1208,23 @@ function favList() {
         if (inputTambah) inputTambah.value = "";
         syncURL(); gambarTray(); muat();
       }
-      /* Status tray ramping: kartu HP tampil sekali saja di duel-head
-         (nama, spek, harga + tombol ×), jadi tray hanya baris status. */
+      /* Status tray ramping: hitung + nama agar user tahu isi kolom
+         tanpa menggulir ke kartu duel. */
       function gambarTray() {
         var tray = document.getElementById("trayDipilih");
         if (!tray) return;
         var aktif = daftarAktif();
         tray.innerHTML = aktif.length
-          ? '<div class="hasil-info">Dibandingkan (' + aktif.length + "/3)</div>"
+          ? '<div class="hasil-info">Dibandingkan (' + aktif.length + "/3): " + aktif.map(function (id) { return esc(byId[id] ? namaPendek(byId[id]) : id); }).join(" vs ") + "</div>"
           : '<div class="hasil-info">Belum ada HP dipilih.</div>';
       }
       if (inputTambah) {
         inputTambah.addEventListener("focus", function () { bukaTambah(); });
+        /* Blur menutup panel seketika (sinkron): klik pertama di luar panel
+           selalu menutupnya dulu (pola dismiss-then-act ala dropdown asli),
+           klik kedua baru mengaktifkan tombol yang dituju. Aman untuk saran
+           karena saran dipilih via mousedown + preventDefault (tanpa blur). */
+        inputTambah.addEventListener("blur", function () { tutupTambah(); });
         inputTambah.addEventListener("input", function () { tambahAktif = 0; if (!tambahBuka) bukaTambah(); else gambarTambah(); });
         inputTambah.addEventListener("keydown", function (e) {
           var daftar = document.getElementById("tambahDaftar");
@@ -1206,7 +1234,7 @@ function favList() {
             e.preventDefault();
             if (!tambahBuka) { bukaTambah(); return; }
             var pil = daftar ? daftar.querySelectorAll("[data-item]")[tambahAktif] : null;
-            if (pil) pil.click();
+            if (pil) tambahHP(pil.getAttribute("data-item"));
             return;
           }
           if (!semua.length) return;
@@ -1220,8 +1248,14 @@ function favList() {
         });
       }
       document.getElementById("btnResetBanding").onclick = function () {
-        /* Di tempat: tanpa reload agar posisi scroll dan fokus tidak hilang. */
+        /* Di tempat: tanpa reload agar posisi scroll dan fokus tidak hilang.
+           Seksi lipatan + filter "hanya beda" ikut dikembalikan agar state
+           baru benar-benar bersih, bukan campuran lama-baru. */
         ids = [];
+        sekTutup = {};
+        sembunyiSama = false;
+        var cs = document.getElementById("cekSama");
+        if (cs) cs.checked = false;
         if (inputTambah) inputTambah.value = "";
         tutupTambah();
         syncURL(); gambarTray(); muat();
@@ -1229,9 +1263,19 @@ function favList() {
       };
       document.getElementById("btnSalinBanding").onclick = function (e) {
         var url = location.href;
-          function done() { toast("Tautan perbandingan tersalin"); e.target.textContent = "Tersalin"; setTimeout(function () { e.target.textContent = COPY.salinTautan; }, 2000); }
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, done);
-        else done();
+        function done(ok) {
+          toast(ok === false ? "Gagal menyalin tautan" : "Tautan perbandingan tersalin");
+          e.target.textContent = ok === false ? "Gagal" : "Tersalin";
+          setTimeout(function () { e.target.textContent = COPY.salinTautan; }, 2000);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { done(true); }, function () { done(false); });
+        else {
+          try {
+            var t = document.createElement("textarea");
+            t.value = url; document.body.appendChild(t); t.select();
+            document.execCommand("copy"); document.body.removeChild(t); done(true);
+          } catch (err) { done(false); }
+        }
       };
       var cek = document.getElementById("cekBeda");
       if (cek) cek.onchange = function () { sorot = cek.checked; syncURL(); muat(); };
@@ -1244,15 +1288,24 @@ function favList() {
           '<a class="tombol" href="#/compare?ids=samsung-galaxy-s24-ultra,iphone-15-pro-max">S24 Ultra vs iPhone 15 Pro Max</a> ' +
           '<a class="tombol" href="#/compare?ids=infinix-note-40-pro,samsung-galaxy-a54">Note 40 Pro vs Galaxy A54</a>';
       }
-      /* Satu HP: butuh satu lawan. Pilih di slot yang masih kosong atau duel populer. */
+      /* Satu HP: butuh satu lawan. Pilih di slot yang masih kosong atau duel populer.
+         Sediakan tombol hapus agar satu HP pun bisa dibuang tanpa reset semua. */
       function renderTunggal(box, id) {
         var p = byId[id];
         if (!p) { box.innerHTML = '<div class="error-box">HP tidak dikenal.</div>'; return; }
-        box.innerHTML = '<div class="tunggal"><div class="min0"><b>' + esc(p.name) + "</b><br><span class=\"hasil-info\">" + formatIDR(hargaMin(p)) + " · AnTuTu " + Number(p.antutu).toLocaleString("id-ID") + " · " + esc(p.memory.ramUtama) + "GB RAM</span></div></div>" +
+        box.innerHTML = '<div class="tunggal"><div class="min0"><b>' + esc(p.name) + "</b><br><span class=\"hasil-info\">" + formatIDR(hargaMin(p)) + " · AnTuTu " + Number(p.antutu).toLocaleString("id-ID") + " · " + esc(p.memory.ramUtama) + "GB RAM</span></div>" +
+          '<div><button class="link-bersih" id="btnHapusTunggal" type="button">Hapus HP ini</button></div></div>' +
           '<div class="kosong kosong-tunggal"><b>Pilih satu HP lagi</b> lewat kolom tambah di atas, atau buka duel populer:<br><br>' + duelButtons() + "</div>";
+        var hb = document.getElementById("btnHapusTunggal");
+        if (hb) hb.onclick = function () {
+          ids = [];
+          if (inputTambah) inputTambah.value = "";
+          syncURL(); gambarTray(); muat();
+        };
       }
       /* Sembunyikan baris yang sama: murni CSS + hitung ulang angka seksi.
-         Tanpa fetch ulang. Seksi yang kosong total ikut dilipat. */
+         Tanpa fetch ulang. Seksi yang kosong total ikut dilipat.
+         Baris yang dilipat manual ikut dikecualikan dari hitungan. */
       function terapSama() {
         var box = document.getElementById("hasilBanding");
         if (!box) return;
@@ -1260,7 +1313,7 @@ function favList() {
         if (cmp) cmp.classList.toggle("tutup-sama", !!sembunyiSama);
         box.querySelectorAll("[data-toggle]").forEach(function (btn) {
           var key = btn.getAttribute("data-toggle");
-          var vis = box.querySelectorAll('div[data-sek="' + key + '"].cmp-baris:not(.sama)').length;
+          var vis = box.querySelectorAll('div[data-sek="' + key + '"].cmp-baris:not(.sama):not(.tutup)').length;
           var head = btn.closest(".cmp-sek");
           if (head) head.classList.toggle("tutup-sek", !!sembunyiSama && vis === 0);
           btn.innerHTML = (sekTutup[key] ? "&#9656; " : "&#9662; ") + esc(btn.getAttribute("data-judul")) + ' <span class="hasil-info">(' + (sembunyiSama ? vis : btn.getAttribute("data-jml")) + ")</span>";
@@ -1526,7 +1579,9 @@ function favList() {
               sekTutup[key] = !sekTutup[key];
               box.querySelectorAll('div[data-sek="' + key + '"]').forEach(function (el) { el.classList.toggle("tutup", !!sekTutup[key]); });
               btn.setAttribute("aria-expanded", sekTutup[key] ? "false" : "true");
-              btn.innerHTML = (sekTutup[key] ? "&#9656; " : "&#9662; ") + esc(btn.getAttribute("data-judul")) + ' <span class="hasil-info">(' + esc(btn.getAttribute("data-jml")) + ")</span>";
+              /* Hitung ulang lewat terapSama agar angka seksi tetap benar
+                 saat mode "hanya beda" aktif. */
+              terapSama();
             };
           });
           box.querySelectorAll("[data-lepas]").forEach(function (b) {
