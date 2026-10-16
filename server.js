@@ -114,7 +114,7 @@ const TokoHP = {
 function ringkasHP(p) {
   const full = withRating(p);
   return {
-    id: full.id, name: full.name, brand: full.brand, released: full.released,
+    id: full.id, name: full.name, brand: full.brand, kategori: full.kategori || "HP", released: full.released,
     launch: { rilis: (full.launch && full.launch.rilis) || full.released },
     rating: full.rating, reviewCount: full.reviewCount,
     ratingLive: full.ratingLive, reviewCountLive: full.reviewCountLive,
@@ -135,8 +135,27 @@ app.get("/api/health", (req, res) => { cacheDetik(res, 300); res.json({ ok: true
 app.get("/api/stats", (req, res) => {
   cacheDetik(res, 300);
   const map = {};
-  PHONES.forEach((p) => { map[p.brand] = (map[p.brand] || 0) + 1; });
-  res.json({ ok: true, totalPhones: PHONES.length, totalNews: NEWS.length, totalBrands: Object.keys(map).length });
+  const perKategori = {};
+  PHONES.forEach((p) => {
+    map[p.brand] = (map[p.brand] || 0) + 1;
+    const k = p.kategori || "HP";
+    perKategori[k] = (perKategori[k] || 0) + 1;
+  });
+  res.json({ ok: true, totalPhones: PHONES.length, totalNews: NEWS.length, totalBrands: Object.keys(map).length, perKategori });
+});
+
+app.get("/api/kategori", (req, res) => {
+  cacheDetik(res, 300);
+  const map = {};
+  PHONES.forEach((p) => {
+    const k = p.kategori || "HP";
+    if (!map[k]) map[k] = { kategori: k, count: 0, minHarga: Infinity };
+    map[k].count++;
+    const h = minPrice(p);
+    if (h < map[k].minHarga) map[k].minHarga = h;
+  });
+  const urutan = ["HP", "Tablet", "Laptop", "Jam", "Audio"];
+  res.json(Object.values(map).sort((a, b) => urutan.indexOf(a.kategori) - urutan.indexOf(b.kategori)));
 });
 
 app.get("/api/brands", (req, res) => {
@@ -169,6 +188,11 @@ app.get("/api/phones", (req, res) => {
     if (brand && brand !== "Semua" && !TokoHP.adaMerek(brand)) {
       return kirimGalat(res, 400, "Merek tidak dikenal.");
     }
+    const KATS = ["HP", "Tablet", "Laptop", "Jam", "Audio"];
+    const kat = (req.query.kategori || "").toString().trim();
+    if (kat && kat !== "Semua" && KATS.indexOf(kat) === -1) {
+      return kirimGalat(res, 400, "Kategori tidak dikenal.");
+    }
     const ringkas = req.query.ringkas === "1" || req.query.ringkas === "true";
     const only5G = req.query.only5G === "1" || req.query.only5G === "true";
     // Filter baru: baterai minimal (mAh) dan NFC. Untuk apa: baterai = daya tahan,
@@ -200,6 +224,7 @@ app.get("/api/phones", (req, res) => {
       out.forEach((p) => peringkat.set(p.id, skor(p)));
     }
     if (brand && brand !== "Semua") out = out.filter((p) => p.brand === brand);
+    if (kat && kat !== "Semua") out = out.filter((p) => (p.kategori || "HP") === kat);
     if (minP !== null && !Number.isNaN(minP)) out = out.filter((p) => minPrice(p) >= minP);
     if (maxP !== null && !Number.isNaN(maxP)) out = out.filter((p) => minPrice(p) <= maxP);
     if (ram) out = out.filter((p) => p.memory.ramUtama >= ram);
@@ -227,7 +252,7 @@ app.get("/api/phones", (req, res) => {
     else out.sort(dasar);
 
     const page = Math.max(1, parseInt(req.query.page || "1", 10) || 1);
-    const limit = Math.min(24, Math.max(1, parseInt(req.query.limit || "9", 10) || 9));
+    const limit = Math.min(60, Math.max(1, parseInt(req.query.limit || "9", 10) || 9));
     const total = out.length;
     const pages = Math.max(1, Math.ceil(total / limit));
     const safePage = Math.min(page, pages);
@@ -255,7 +280,8 @@ app.get("/api/phones/:id/similar", (req, res) => {
   if (!p) return kirimGalat(res, 404, "Perangkat tidak ditemukan.");
   cacheDetik(res, 60);
   const low = minPrice(p);
-  const scored = PHONES.filter((x) => x.id !== p.id).map((x) => {
+  const katP = p.kategori || "HP";
+  const scored = PHONES.filter((x) => x.id !== p.id && (x.kategori || "HP") === katP).map((x) => {
     let score = 0;
     if (x.brand === p.brand) score += 3;
     const diff = Math.abs(minPrice(x) - low) / low;
@@ -282,6 +308,12 @@ app.get("/api/compare", (req, res) => {
     const p = TokoHP.ambil(id);
     if (!p) return kirimGalat(res, 404, "ID tidak valid: " + id);
     result.push({ ...withRating(p), hargaTermurah: minPrice(p) });
+  }
+  /* Pembanding hanya sah dalam satu kategori: skor AnTuTu HP vs laptop
+     tidak sebanding, begitu pula baterai jam vs tablet. */
+  const kats = [...new Set(result.map((r) => r.kategori || "HP"))];
+  if (kats.length > 1) {
+    return kirimGalat(res, 400, "Bandingkan produk dalam satu kategori yang sama (" + kats.join(", ") + ").");
   }
   cacheDetik(res, 30);
   res.json(result);
