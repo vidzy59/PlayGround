@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const compression = require("compression");
+const fs = require("fs");
 const path = require("path");
 const { PHONES, NEWS, AFF, ADS } = require("./data");
 
@@ -19,6 +21,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cors());
+app.use(compression({ level: 6 }));
 app.use(express.json({ limit: "256kb" }));
 /* Cache API pendek (bukan no-store total): harga berubah hitungan jam,
    bukan detik. Daftar/brand boleh dicache 60 dtk, detail 30 dtk —
@@ -37,7 +40,18 @@ app.use((req, res, next) => {
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   next();
 });
-app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h", etag: true }));
+/* Cache statis berlapis: HTML selalu revalidasi (agar deploy baru langsung
+   terlihat), aset berversi (?v=N) immutable 1 tahun, sisanya 1 jam + ETag. */
+app.use(express.static(path.join(__dirname, "public"), {
+  maxAge: "1h", etag: true,
+  setHeaders: function (res, filePath) {
+    if (/\.html$/.test(filePath)) {
+      res.setHeader("Cache-Control", "no-cache");
+    } else if (res.req && res.req.query && res.req.query.v) {
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    }
+  }
+}));
 
 // Favicon: 204 agar browser tidak menerima HTML sebagai ikon
 app.get("/favicon.ico", (req, res) => res.status(204).end());
@@ -165,9 +179,25 @@ app.get("/api/phones", (req, res) => {
     const onlyWireless = req.query.onlyWireless === "1" || req.query.onlyWireless === "true";
     const sort = (req.query.sort || "populer").toString();
 
+    let peringkat = null;
     if (q) {
       const re = new RegExp(escapeReg(q), "i");
+      const ql = q.toLowerCase();
       out = out.filter((p) => re.test(p.name) || re.test(p.brand) || re.test(p.platform.chipset));
+      /* Relevansi pencarian (penting untuk autocomplete limit-6): nama persis >
+         awalan nama > kata cocok > merek > chipset > sisanya. */
+      const skor = (p) => {
+        const nama = String(p.name).toLowerCase(), merek = String(p.brand).toLowerCase();
+        const chip = String(p.platform.chipset).toLowerCase();
+        if (nama === ql) return 0;
+        if (nama.startsWith(ql)) return 1;
+        if (nama.split(/[\s-]+/).some((w) => w.startsWith(ql))) return 2;
+        if (merek === ql || merek.startsWith(ql)) return 3;
+        if (chip.includes(ql)) return 4;
+        return 5;
+      };
+      peringkat = new Map();
+      out.forEach((p) => peringkat.set(p.id, skor(p)));
     }
     if (brand && brand !== "Semua") out = out.filter((p) => p.brand === brand);
     if (minP !== null && !Number.isNaN(minP)) out = out.filter((p) => minPrice(p) >= minP);
@@ -190,7 +220,11 @@ app.get("/api/phones", (req, res) => {
       rating: (a, b) => b.ratingLive - a.ratingLive,
       nama: (a, b) => a.name.localeCompare(b.name)
     };
-    out.sort(sorters[sort] || sorters.populer);
+    /* Bila mencari, relevansi menang atas urutan katalog; sorter katalog
+       jadi penentu seri agar hasil tetap stabil. */
+    const dasar = sorters[sort] || sorters.populer;
+    if (peringkat) out.sort((a, b) => (peringkat.get(a.id) - peringkat.get(b.id)) || dasar(a, b));
+    else out.sort(dasar);
 
     const page = Math.max(1, parseInt(req.query.page || "1", 10) || 1);
     const limit = Math.min(24, Math.max(1, parseInt(req.query.limit || "9", 10) || 9));
@@ -263,6 +297,69 @@ app.get("/api/news/:id", (req, res) => {
   res.json({ ...n, terkait });
 });
 
+/* Ulasan pengunjung per perangkat: simpan file JSON lokal (tanpa akun).
+   Aturan main: nama 2-40 huruf, bintang 1-5 bulat, komentar 4-500 huruf,
+   tanpa tautan (anti-spam), maks 5 kiriman per IP per 10 menit,
+   maks 200 ulasan per HP. Render selalu lolos esc() di frontend. */
+const FILE_ULASAN = path.join(__dirname, "reviews.json");
+let ulasan = {};
+try {
+  const mentah = JSON.parse(fs.readFileSync(FILE_ULASAN, "utf8"));
+  if (mentah && typeof mentah === "object") ulasan = mentah;
+} catch (e) { ulasan = {}; }
+let antreTulis = Promise.resolve();
+function simpanUlasan() {
+  const data = JSON.stringify(ulasan);
+  antreTulis = antreTulis
+    .then(() => fs.promises.writeFile(FILE_ULASAN + ".tmp", data))
+    .then(() => fs.promises.rename(FILE_ULASAN + ".tmp", FILE_ULASAN))
+    .catch((e) => console.error("gagal simpan ulasan:", e.message));
+}
+const batasUlasan = new Map();
+function bolehUlas(ip) {
+  const kini = Date.now();
+  const riwayat = (batasUlasan.get(ip) || []).filter((t) => kini - t < 10 * 60 * 1000);
+  if (riwayat.length >= 5) return false;
+  riwayat.push(kini);
+  batasUlasan.set(ip, riwayat);
+  if (batasUlasan.size > 2000) batasUlasan.clear();
+  return true;
+}
+function ringkasUlasan(id) {
+  const list = (ulasan[id] || []).slice().reverse();
+  const count = list.length;
+  const avg = count ? Math.round((list.reduce((a, r) => a + r.rating, 0) / count) * 10) / 10 : 0;
+  return { avg, count, list: list.slice(0, 50) };
+}
+app.get("/api/phones/:id/reviews", (req, res) => {
+  if (!isId(req.params.id)) return kirimGalat(res, 400, "ID perangkat tidak valid.");
+  if (!TokoHP.ambil(req.params.id)) return kirimGalat(res, 404, "Perangkat tidak ditemukan.");
+  cacheDetik(res, 15);
+  res.json(ringkasUlasan(req.params.id));
+});
+app.post("/api/phones/:id/reviews", (req, res) => {
+  if (!isId(req.params.id)) return kirimGalat(res, 400, "ID perangkat tidak valid.");
+  if (!TokoHP.ambil(req.params.id)) return kirimGalat(res, 404, "Perangkat tidak ditemukan.");
+  const body = req.body || {};
+  const nama = String(body.nama || "").trim().slice(0, 40);
+  const komentar = String(body.komentar || "").trim().slice(0, 500);
+  const rating = Number(body.rating);
+  if (nama.length < 2) return kirimGalat(res, 400, "Nama minimal 2 huruf.");
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) return kirimGalat(res, 400, "Peringkat harus 1 sampai 5.");
+  if (komentar.length < 4) return kirimGalat(res, 400, "Komentar minimal 4 huruf.");
+  if (/https?:\/\/|www\./i.test(nama + " " + komentar)) return kirimGalat(res, 400, "Tautan tidak diizinkan di ulasan.");
+  const ip = String((req.headers["x-forwarded-for"] || req.ip || "?")).split(",")[0].trim();
+  if (!bolehUlas(ip)) return kirimGalat(res, 429, "Terlalu sering mengirim. Coba lagi nanti.");
+  const id = req.params.id;
+  if (!ulasan[id]) ulasan[id] = [];
+  ulasan[id].push({ nama, rating, komentar, ts: Date.now() });
+  if (ulasan[id].length > 200) ulasan[id] = ulasan[id].slice(-200);
+  simpanUlasan();
+  noCache(res);
+  const hasil = ringkasUlasan(id);
+  res.status(201).json({ ok: true, avg: hasil.avg, count: hasil.count });
+});
+
 // Config afiliasi + iklan untuk frontend (tanpa data sensitif lain).
 app.get("/api/aff", (req, res) => { cacheDetik(res, 300); res.json(AFF || { aktif: false }); });
 app.get("/api/ads", (req, res) => { cacheDetik(res, 300); res.json(ADS || { aktif: false }); });
@@ -290,6 +387,14 @@ app.use((err, req, res, next) => {
 });
 
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`SpekHP berjalan di http://localhost:${PORT}`));
+  const server = app.listen(PORT, () => console.log(`SpekHP berjalan di http://localhost:${PORT} (${PHONES.length} HP, ${NEWS.length} berita)`));
+  /* Mati bersih saat deploy ulang: jangan putus respons yang sedang jalan. */
+  const tutup = (sinyal) => {
+    console.log("Menerima " + sinyal + ", menutup server...");
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 5000).unref();
+  };
+  process.on("SIGTERM", () => tutup("SIGTERM"));
+  process.on("SIGINT", () => tutup("SIGINT"));
 }
 module.exports = app;
