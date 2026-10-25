@@ -1,0 +1,26 @@
+{
+  "name": "SpekGadget Arena - Spesifikasi dan Harga Gadget",
+  "short_name": "SpekGadget",
+  "description": "Referensi spesifikasi, harga, proyek perangkat, dan perbandingan gadget Indonesia.",
+  "lang": "id",
+  "dir": "ltr",
+  "start_url": "/#/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#f2f2f7",
+  "theme_color": "#0f5a44",
+  "categories": ["shopping", "utilities", "reference"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Katalog", "short_name": "Katalog", "url": "/#/phones", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Proyek", "short_name": "Proyek", "url": "/#/projects", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Perbandingan", "short_name": "Banding", "url": "/#/compare", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
